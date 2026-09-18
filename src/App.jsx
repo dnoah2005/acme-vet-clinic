@@ -49,11 +49,17 @@ function App() {
             <p>Welcome back to ACME Vet Clinic.</p>
 
             <form>
-              <label>Email</label>
-              <input type="email" placeholder="Enter your email" />
+              <label>Username</label>
+              <input
+                type="text"
+                placeholder="Enter your username"
+              />
 
               <label>Password</label>
-              <input type="password" placeholder="Enter your password" />
+              <input
+                type="password"
+                placeholder="Enter your password"
+              />
 
               <button className="primary-button" type="submit">
                 Login
@@ -81,7 +87,16 @@ function App() {
 
             <form>
               <label>Full Name</label>
-              <input type="text" placeholder="Enter your name" />
+              <input
+                type="text"
+                placeholder="Enter your name"
+              />
+
+              <label>Username</label>
+              <input
+                type="text"
+                placeholder="Create a username"
+              />
 
               <label>Role</label>
               <select defaultValue="">
@@ -94,15 +109,21 @@ function App() {
               </select>
 
               <label>Email</label>
-              <input type="email" placeholder="Enter your email" />
+              <input
+                type="email"
+                placeholder="Enter your email"
+              />
 
               <label>Password</label>
-              <input type="password" placeholder="Create a password" />
+              <input
+                type="password"
+                placeholder="Create a password"
+              />
 
               <button className="primary-button" type="submit">
-                Sign Up
-              </button>
-            </form>
+                  Sign Up
+                </button>
+              </form>
 
             <button
               className="back-button"

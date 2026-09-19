@@ -125,6 +125,8 @@ input {
   padding: 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
+  background: #f0f8ff;
+  color: #263238;
 }
 
 input:focus {
@@ -168,6 +170,9 @@ select {
   background: white;
   color: #263238;
   font: inherit;
+}
+input::placeholder {
+  color: #333333;
 }
 
 select:focus {

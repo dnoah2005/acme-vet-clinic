@@ -1,0 +1,54 @@
+.calendar-page {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: white;
+  color: black;
+  box-sizing: border-box;
+}
+
+.calendar-page h1 {
+  color: black;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.calendar-box {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: black;
+  background-color: white;
+}
+
+.calendar-box .fc {
+  color: black;
+  background-color: white;
+}
+
+.calendar-box .fc-toolbar-title {
+  color: black;
+}
+
+.calendar-box .fc-button {
+  color: white;
+}
+
+.calendar-box .fc-col-header-cell-cushion {
+  color: black;
+}
+
+.calendar-box .fc-daygrid-day-number {
+  color: black;
+}
+
+.calendar-box .fc-daygrid-day {
+  background-color: white;
+}
+
+.calendar-box .fc-scrollgrid {
+  border-color: #cccccc;
+}
+
+.calendar-box .fc-scrollgrid td,
+.calendar-box .fc-scrollgrid th {
+  border-color: #cccccc;
+}

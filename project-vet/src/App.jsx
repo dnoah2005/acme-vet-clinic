@@ -1,4 +1,4 @@
-
+import Calendar from "./Calendar";
 import { useState, useEffect } from "react";
 import "./App.css";
 
@@ -15,6 +15,7 @@ function App() {
   });
 
   const [signupMessage, setSignupMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:8080/")
@@ -39,6 +40,8 @@ function App() {
   const handleSignupSubmit = async (event) => {
     event.preventDefault();
 
+    setSignupMessage("");
+
     try {
       const response = await fetch("http://localhost:8080/signup", {
         method: "POST",
@@ -62,17 +65,54 @@ function App() {
         setSignupMessage("Error creating account.");
       }
     } catch (error) {
-      setSignupMessage("Could not connect to the backend.");
       console.error(error);
+      setSignupMessage("Could not connect to the backend.");
+    }
+  };
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+
+    setLoginMessage("");
+
+    const username = event.target.username.value;
+    const password = event.target.password.value;
+
+    try {
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          lusername: username,
+          lpassword: password
+        })
+      });
+
+      const data = await response.text();
+
+      if (response.ok && data === "Login successful") {
+        setPage("calendar");
+      } else {
+        setLoginMessage("Invalid username or password.");
+      }
+    } catch (error) {
+      console.error(error);
+      setLoginMessage("Could not connect to the backend.");
     }
   };
 
   return (
     <div className="app">
+
       {page === "welcome" && (
         <div className="welcome-page">
           <div className="welcome-card">
-            <div className="logo">🐾</div>
+
+            <div className="logo">
+              🐾
+            </div>
 
             <h1 className="clinic-title">
               Welcome to ACME Vet Clinic
@@ -82,23 +122,34 @@ function App() {
               Caring for your pets, every step of the way.
             </p>
 
-            <p>{backendMessage}</p>
+            <p>
+              {backendMessage}
+            </p>
 
             <div className="button-container">
+
               <button
                 className="primary-button"
-                onClick={() => setPage("login")}
+                onClick={() => {
+                  setLoginMessage("");
+                  setPage("login");
+                }}
               >
                 Login
               </button>
 
               <button
                 className="secondary-button"
-                onClick={() => setPage("signup")}
+                onClick={() => {
+                  setSignupMessage("");
+                  setPage("signup");
+                }}
               >
                 Sign Up
               </button>
+
             </div>
+
           </div>
         </div>
       )}
@@ -106,29 +157,53 @@ function App() {
       {page === "login" && (
         <div className="form-page">
           <div className="form-card">
+
             <h2 className="login-title">
               Login
             </h2>
 
-            <p>Welcome back to ACME Vet Clinic.</p>
+            <p>
+              Welcome back to ACME Vet Clinic.
+            </p>
 
-            <form>
-              <label>Username</label>
+            <form onSubmit={handleLoginSubmit}>
+
+              <label>
+                Username
+              </label>
+
               <input
                 type="text"
+                name="username"
                 placeholder="Enter your username"
+                required
               />
 
-              <label>Password</label>
+              <label>
+                Password
+              </label>
+
               <input
                 type="password"
+                name="password"
                 placeholder="Enter your password"
+                required
               />
 
-              <button className="primary-button" type="submit">
+              <button
+                className="primary-button"
+                type="submit"
+              >
                 Login
               </button>
+
             </form>
+
+            {loginMessage && (
+              <p className="error-message">
+                {loginMessage}
+              </p>
+            )}
 
             <button
               className="back-button"
@@ -136,6 +211,7 @@ function App() {
             >
               Back to Home
             </button>
+
           </div>
         </div>
       )}
@@ -143,14 +219,21 @@ function App() {
       {page === "signup" && (
         <div className="form-page">
           <div className="form-card">
+
             <h2 className="sign-up-title">
               Create an Account
             </h2>
 
-            <p>Sign up for ACME Vet Clinic.</p>
+            <p>
+              Sign up for ACME Vet Clinic.
+            </p>
 
             <form onSubmit={handleSignupSubmit}>
-              <label>Full Name</label>
+
+              <label>
+                Full Name
+              </label>
+
               <input
                 type="text"
                 name="lname"
@@ -160,7 +243,10 @@ function App() {
                 required
               />
 
-              <label>Username</label>
+              <label>
+                Username
+              </label>
+
               <input
                 type="text"
                 name="lusername"
@@ -170,7 +256,10 @@ function App() {
                 required
               />
 
-              <label>Role</label>
+              <label>
+                Role
+              </label>
+
               <select
                 name="role"
                 value={signupData.role}
@@ -180,12 +269,24 @@ function App() {
                 <option value="" disabled>
                   Select your role
                 </option>
-                <option value="hr">HR</option>
-                <option value="doctor">Doctor</option>
-                <option value="technician">Technician</option>
+
+                <option value="hr">
+                  HR
+                </option>
+
+                <option value="doctor">
+                  Doctor
+                </option>
+
+                <option value="technician">
+                  Technician
+                </option>
               </select>
 
-              <label>Email</label>
+              <label>
+                Email
+              </label>
+
               <input
                 type="email"
                 name="lemail"
@@ -195,7 +296,10 @@ function App() {
                 required
               />
 
-              <label>Password</label>
+              <label>
+                Password
+              </label>
+
               <input
                 type="password"
                 name="lpassword"
@@ -205,12 +309,20 @@ function App() {
                 required
               />
 
-              <button className="primary-button" type="submit">
+              <button
+                className="primary-button"
+                type="submit"
+              >
                 Sign Up
               </button>
+
             </form>
 
-            <p>{signupMessage}</p>
+            {signupMessage && (
+              <p className="signup-message">
+                {signupMessage}
+              </p>
+            )}
 
             <button
               className="back-button"
@@ -218,9 +330,15 @@ function App() {
             >
               Back to Home
             </button>
+
           </div>
         </div>
       )}
+
+      {page === "calendar" && (
+        <Calendar />
+      )}
+
     </div>
   );
 }

@@ -1,22 +1,21 @@
-.calendar-page {
+
+.scheduling-calendar-page {
   width: 100%;
   min-height: 100vh;
-  padding: 30px 40px 40px 40px;
+  padding: 30px 40px 40px;
   box-sizing: border-box;
   background-color: white;
   color: black;
 }
 
-.calendar-page h1 {
+.scheduling-calendar-page h1 {
   text-align: center;
   color: black;
-  margin: 0 0 25px 0;
+  margin: 0 0 25px;
   font-size: 32px;
 }
 
-/* Month navigation */
-
-.calendar-navigation {
+.scheduling-calendar-navigation {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,7 +23,7 @@
   margin-bottom: 20px;
 }
 
-.calendar-navigation h2 {
+.scheduling-calendar-navigation h2 {
   margin: 0;
   font-size: 30px;
   font-weight: 700;
@@ -33,7 +32,7 @@
   color: black !important;
 }
 
-.calendar-arrow {
+.scheduling-calendar-arrow {
   border: none;
   background: none;
   color: black;
@@ -44,19 +43,15 @@
   padding: 5px 15px;
 }
 
-.calendar-arrow:hover {
+.scheduling-calendar-arrow:hover {
   color: #666666;
 }
 
-/* Calendar */
-
-.fc {
+.scheduling-calendar-page .fc {
   width: 100%;
 }
 
-/* Day headers */
-
-.my-day-header {
+.scheduling-calendar-page .scheduling-day-header {
   border: 1px solid #999 !important;
   background-color: #f2f2f2 !important;
   color: black !important;
@@ -64,31 +59,23 @@
   padding: 12px 5px;
 }
 
-/* Calendar date cells */
-
-.my-calendar-cell {
+.scheduling-calendar-page .scheduling-calendar-cell {
   border: 1px solid #999 !important;
   background-color: white;
 }
 
-/* Today's cell */
-
-.my-calendar-today {
+.scheduling-calendar-page .scheduling-calendar-today {
   background-color: #fffdf0 !important;
 }
 
-/* Date numbers */
-
-.my-day-number {
+.scheduling-calendar-page .scheduling-day-number {
   color: black !important;
   font-size: 16px;
   font-weight: 500;
   padding: 10px;
 }
 
-/* Today's date number */
-
-.my-day-number-today {
+.scheduling-calendar-page .scheduling-day-number-today {
   background-color: #ffd84d !important;
   color: black !important;
   font-weight: 700 !important;
@@ -107,13 +94,11 @@
     0 0 18px rgba(255, 216, 77, 0.9);
 }
 
-/* Calendar borders */
-
-.fc table {
+.scheduling-calendar-page .fc table {
   border-collapse: collapse !important;
 }
 
-.fc td,
-.fc th {
+.scheduling-calendar-page .fc td,
+.scheduling-calendar-page .fc th {
   border: 1px solid #999 !important;
 }

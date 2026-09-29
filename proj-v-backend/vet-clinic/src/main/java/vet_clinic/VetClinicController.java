@@ -14,11 +14,19 @@ public class VetClinicController {
 
     @GetMapping("/")
     public String welcome() {
-        return "Welcome to ACME Vet Clinic Backend!";
+        return "Your pet is our number one priority";
     }
 
     @PostMapping("/signup")
     public Login signup(@RequestBody Login login) {
         return loginRepository.save(login);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Login login) {
+        return loginRepository.findByLusername(login.getLusername())
+                .filter(user -> user.getLpassword().equals(login.getLpassword()))
+                .map(user -> user.getRole())
+                .orElse("Invalid username or password");
     }
 }

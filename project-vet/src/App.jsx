@@ -1,4 +1,4 @@
-import Calendar from "./Calendar";
+import DoctorDashboard from "./DoctorDashboard";
 import { useState, useEffect } from "react";
 import "./App.css";
 
@@ -70,38 +70,42 @@ function App() {
     }
   };
 
-  const handleLoginSubmit = async (event) => {
-    event.preventDefault();
+const handleLoginSubmit = async (event) => {
+  event.preventDefault();
 
-    setLoginMessage("");
+  setLoginMessage("");
 
-    const username = event.target.username.value;
-    const password = event.target.password.value;
+  const username = event.target.username.value;
+  const password = event.target.password.value;
 
-    try {
-      const response = await fetch("http://localhost:8080/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          lusername: username,
-          lpassword: password
-        })
-      });
+  try {
+    const response = await fetch("http://localhost:8080/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lusername: username,
+        lpassword: password
+      })
+    });
 
-      const data = await response.text();
+    const data = await response.text();
 
-      if (response.ok && data === "Login successful") {
-        setPage("calendar");
-      } else {
-        setLoginMessage("Invalid username or password.");
-      }
-    } catch (error) {
-      console.error(error);
-      setLoginMessage("Could not connect to the backend.");
+    if (response.ok && data === "doctor") {
+      setPage("doctor");
+    } else if (response.ok && data !== "Invalid username or password") {
+      setLoginMessage(
+        "Login successful. The doctor calendar is only available to doctors."
+      );
+    } else {
+      setLoginMessage("Invalid username or password.");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setLoginMessage("Could not connect to the backend.");
+  }
+};
 
   return (
     <div className="app">
@@ -335,10 +339,9 @@ function App() {
         </div>
       )}
 
-      {page === "calendar" && (
-        <Calendar />
+      {page === "doctor" && (
+        <DoctorDashboard />
       )}
-
     </div>
   );
 }

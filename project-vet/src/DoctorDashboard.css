@@ -1,0 +1,37 @@
+.doctor-dashboard {
+  width: 100%;
+  min-height: 100vh;
+  background-color: white;
+}
+
+.doctor-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 20px 0 20px;
+  background-color: white;
+}
+
+.doctor-tabs button {
+  padding: 12px 30px;
+  border: 1px solid #999;
+  background-color: #eeeeee;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.doctor-tabs button:hover {
+  background-color: #dddddd;
+}
+
+.doctor-tabs button.active-tab {
+  background-color: #333333;
+  color: white;
+}
+
+.scheduling-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  background-color: white;
+}

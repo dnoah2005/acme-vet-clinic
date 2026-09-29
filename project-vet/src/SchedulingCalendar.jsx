@@ -1,3 +1,4 @@
+
 import { useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/react/daygrid";
@@ -5,9 +6,9 @@ import dayGridPlugin from "@fullcalendar/react/daygrid";
 import "@fullcalendar/react/skeleton.css";
 import "@fullcalendar/react/themes/classic/theme.css";
 
-import "./Calendar.css";
+import "./SchedulingCalendar.css";
 
-function Calendar() {
+function SchedulingCalendar() {
   const calendarRef = useRef(null);
   const [calendarTitle, setCalendarTitle] = useState("");
 
@@ -24,13 +25,13 @@ function Calendar() {
   };
 
   return (
-    <div className="calendar-page">
-      <h1>Schedule View</h1>
+    <div className="scheduling-calendar-page">
+      <h1>Scheduling</h1>
 
-      <div className="calendar-navigation">
+      <div className="scheduling-calendar-navigation">
         <button
           onClick={handlePrevious}
-          className="calendar-arrow"
+          className="scheduling-calendar-arrow"
         >
           ←
         </button>
@@ -39,7 +40,7 @@ function Calendar() {
 
         <button
           onClick={handleNext}
-          className="calendar-arrow"
+          className="scheduling-calendar-arrow"
         >
           →
         </button>
@@ -54,23 +55,20 @@ function Calendar() {
         fixedWeekCount={false}
         height="auto"
         datesSet={handleDatesSet}
-
-        dayHeaderClass="my-day-header"
-
+        dayHeaderClass="scheduling-day-header"
         dayCellClass={(state) =>
           state.isToday
-            ? "my-calendar-cell my-calendar-today"
-            : "my-calendar-cell"
+            ? "scheduling-calendar-cell scheduling-calendar-today"
+            : "scheduling-calendar-cell"
         }
-
         dayCellTopInnerClass={(state) =>
           state.isToday
-            ? "my-day-number my-day-number-today"
-            : "my-day-number"
+            ? "scheduling-day-number scheduling-day-number-today"
+            : "scheduling-day-number"
         }
       />
     </div>
   );
 }
 
-export default Calendar;
+export default SchedulingCalendar;

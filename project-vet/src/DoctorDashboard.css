@@ -1,37 +1,73 @@
+
 .doctor-dashboard {
-  width: 100%;
   min-height: 100vh;
-  background-color: white;
+  background: white;
 }
 
 .doctor-tabs {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  padding: 20px 20px 0 20px;
-  background-color: white;
+  gap: 0;
+  background: #263238;
+  border-bottom: 3px solid #1b2529;
 }
 
 .doctor-tabs button {
-  padding: 12px 30px;
-  border: 1px solid #999;
-  background-color: #eeeeee;
-  color: black;
+  padding: 16px 35px;
+  border: none;
+  background: #37474f;
+  color: white;
   font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
+  border-right: 1px solid #52656d;
+}
+
+.doctor-tabs button:first-child {
+  border-left: 1px solid #52656d;
 }
 
 .doctor-tabs button:hover {
-  background-color: #dddddd;
+  background: #455a64;
 }
 
 .doctor-tabs button.active-tab {
-  background-color: #333333;
+  background: #1f5f60;
   color: white;
 }
 
-.scheduling-page {
+.doctor-tabs button.logout-tab {
+  margin-left: 25px;
+  background: #8b2e2e;
+  border-left: 1px solid #52656d;
+}
+
+.doctor-tabs button.logout-tab:hover {
+  background: #a83a3a;
+}
+
+.doctor-dashboard-content {
   width: 100%;
-  min-height: calc(100vh - 70px);
-  background-color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+@media (max-width: 600px) {
+  .doctor-tabs {
+    flex-wrap: wrap;
+  }
+
+  .doctor-tabs button {
+    padding: 13px 18px;
+    font-size: 14px;
+  }
+
+  .doctor-tabs button.logout-tab {
+    margin-left: 0;
+  }
+
+  .doctor-dashboard-content {
+    padding: 15px;
+  }
 }

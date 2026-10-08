@@ -1,119 +1,127 @@
+
 .calendar-page {
   width: 100%;
-  min-height: 100vh;
-  padding: 30px 40px 40px 40px;
-  box-sizing: border-box;
-  background-color: white;
-  color: black;
 }
 
 .calendar-page h1 {
   text-align: center;
-  color: black;
-  margin: 0 0 25px 0;
-  font-size: 32px;
+  color: #263238;
+  font-size: 30px;
+  margin: 0 0 20px 0;
+  font-weight: bold;
 }
-
-/* Month navigation */
 
 .calendar-navigation {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 25px;
+  justify-content: center;
+  gap: 30px;
   margin-bottom: 20px;
 }
 
 .calendar-navigation h2 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
   min-width: 220px;
   text-align: center;
-  color: black !important;
+  margin: 0;
+  color: #263238;
+  font-weight: bold;
+  font-size: 24px;
 }
 
 .calendar-arrow {
-  border: none;
-  background: none;
-  color: black;
-  font-size: 38px;
+  width: 50px;
+  height: 42px;
+  border: 2px solid #263238;
+  border-radius: 6px;
+  background: #37474f;
+  color: white;
+  font-size: 27px;
   font-weight: bold;
-  cursor: pointer;
   line-height: 1;
-  padding: 5px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .calendar-arrow:hover {
-  color: #666666;
+  background: #1f292d;
 }
-
-/* Calendar */
-
-.fc {
-  width: 100%;
-}
-
-/* Day headers */
 
 .my-day-header {
-  border: 1px solid #999 !important;
-  background-color: #f2f2f2 !important;
-  color: black !important;
   font-weight: bold;
-  padding: 12px 5px;
+  color: #263238;
 }
-
-/* Calendar date cells */
 
 .my-calendar-cell {
-  border: 1px solid #999 !important;
-  background-color: white;
+  border: 1px solid #d5d5d5 !important;
 }
 
-/* Today's cell */
+.my-calendar-cell:hover {
+  background-color: #f1f5f6 !important;
+}
 
 .my-calendar-today {
   background-color: #fffdf0 !important;
 }
 
-/* Date numbers */
-
-.my-day-number {
-  color: black !important;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px;
+.fc-daygrid-day-number {
+  text-decoration: none !important;
 }
 
-/* Today's date number */
+.fc-daygrid-event {
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-weight: bold;
+}
 
-.my-day-number-today {
-  background-color: #ffd84d !important;
-  color: black !important;
-  font-weight: 700 !important;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 25px;
+  padding: 15px;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  background: #f8fafb;
+}
+
+.calendar-legend-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 6px;
-  padding: 0;
-  box-sizing: border-box;
-  box-shadow:
-    0 0 5px #ffd84d,
-    0 0 10px #ffd84d,
-    0 0 18px rgba(255, 216, 77, 0.9);
+  gap: 7px;
+  color: #263238;
+  font-size: 14px;
+  font-weight: bold;
 }
 
-/* Calendar borders */
-
-.fc table {
-  border-collapse: collapse !important;
+.calendar-legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
 }
 
-.fc td,
-.fc th {
-  border: 1px solid #999 !important;
+.legend-early-morning {
+  background-color: #16a34a;
+}
+
+.legend-eight-thirty {
+  background-color: #2563eb;
+}
+
+.legend-late-doctor {
+  background-color: #ea580c;
+}
+
+.legend-surgery {
+  background-color: #dc2626;
+}
+
+.legend-overnight {
+  background-color: #7c3aed;
+}
+
+.legend-sunday {
+  background-color: #0891b2;
 }

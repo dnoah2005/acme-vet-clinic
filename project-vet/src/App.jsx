@@ -1,3 +1,4 @@
+
 import DoctorDashboard from "./DoctorDashboard";
 import { useState, useEffect } from "react";
 import "./App.css";
@@ -5,6 +6,7 @@ import "./App.css";
 function App() {
   const [page, setPage] = useState("welcome");
   const [backendMessage, setBackendMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [signupData, setSignupData] = useState({
     lname: "",
@@ -43,13 +45,18 @@ function App() {
     setSignupMessage("");
 
     try {
-      const response = await fetch("http://localhost:8080/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(signupData)
-      });
+      const response = await fetch(
+        "http://localhost:8080/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(signupData)
+        }
+      );
+
+      const message = await response.text();
 
       if (response.ok) {
         setSignupMessage("Account created successfully!");
@@ -62,75 +69,106 @@ function App() {
           role: ""
         });
       } else {
-        setSignupMessage("Error creating account.");
+        setSignupMessage(
+          message || "Error creating account."
+        );
       }
     } catch (error) {
       console.error(error);
-      setSignupMessage("Could not connect to the backend.");
+
+      setSignupMessage(
+        "Could not connect to the backend."
+      );
     }
   };
 
-const handleLoginSubmit = async (event) => {
-  event.preventDefault();
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
 
-  setLoginMessage("");
+    setLoginMessage("");
 
-  const username = event.target.username.value;
-  const password = event.target.password.value;
+    const username = event.target.username.value;
+    const password = event.target.password.value;
 
-  try {
-    const response = await fetch("http://localhost:8080/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        lusername: username,
-        lpassword: password
-      })
-    });
-
-    const data = await response.text();
-
-    if (response.ok && data === "doctor") {
-      setPage("doctor");
-    } else if (response.ok && data !== "Invalid username or password") {
-      setLoginMessage(
-        "Login successful. The doctor calendar is only available to doctors."
+    try {
+      const response = await fetch(
+        "http://localhost:8080/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            lusername: username,
+            lpassword: password
+          })
+        }
       );
-    } else {
-      setLoginMessage("Invalid username or password.");
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setLoginMessage(
+          data.message ||
+          "Invalid username or password."
+        );
+
+        return;
+      }
+
+      console.log("Login response:", data);
+
+      if (data.role === "doctor") {
+        setCurrentUser(data);
+        setPage("doctor");
+      } else {
+        setLoginMessage(
+          "Login successful, but this account does not have doctor access."
+        );
+      }
+    } catch (error) {
+      console.error(error);
+
+      setLoginMessage(
+        "Could not connect to the backend."
+      );
     }
-  } catch (error) {
-    console.error(error);
-    setLoginMessage("Could not connect to the backend.");
-  }
-};
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setLoginMessage("");
+    setSignupMessage("");
+    setPage("welcome");
+  };
 
   return (
     <div className="app">
 
       {page === "welcome" && (
-        <div className="welcome-page">
+        <div className="page-container">
+
           <div className="welcome-card">
 
-            <div className="logo">
+            <div className="clinic-logo">
               🐾
             </div>
 
-            <h1 className="clinic-title">
+            <h1>
               Welcome to ACME Vet Clinic
             </h1>
 
-            <p>
-              Caring for your pets, every step of the way.
+            <p className="welcome-subtitle">
+              Caring for your pets, every step of the way
             </p>
 
-            <p>
-              {backendMessage}
-            </p>
+            {backendMessage && (
+              <p className="backend-message">
+                {backendMessage}
+              </p>
+            )}
 
-            <div className="button-container">
+            <div className="welcome-buttons">
 
               <button
                 className="primary-button"
@@ -155,48 +193,51 @@ const handleLoginSubmit = async (event) => {
             </div>
 
           </div>
+
         </div>
       )}
 
       {page === "login" && (
-        <div className="form-page">
+        <div className="page-container">
+
           <div className="form-card">
 
-            <h2 className="login-title">
-              Login
-            </h2>
+            <div className="clinic-logo">
+              🐾
+            </div>
 
-            <p>
-              Welcome back to ACME Vet Clinic.
-            </p>
+            <h1>
+              Welcome back to ACME Vet Clinic
+            </h1>
 
-            <form onSubmit={handleLoginSubmit}>
+            <form
+              onSubmit={handleLoginSubmit}
+              className="clinic-form"
+            >
 
               <label>
                 Username
-              </label>
 
-              <input
-                type="text"
-                name="username"
-                placeholder="Enter your username"
-                required
-              />
+                <input
+                  name="username"
+                  type="text"
+                  required
+                />
+              </label>
 
               <label>
                 Password
+
+                <input
+                  name="password"
+                  type="password"
+                  required
+                />
               </label>
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                required
-              />
-
               <button
-                className="primary-button"
                 type="submit"
+                className="primary-button"
               >
                 Login
               </button>
@@ -204,118 +245,126 @@ const handleLoginSubmit = async (event) => {
             </form>
 
             {loginMessage && (
-              <p className="error-message">
+              <p className="form-message">
                 {loginMessage}
               </p>
             )}
 
             <button
-              className="back-button"
-              onClick={() => setPage("welcome")}
+              className="secondary-button"
+              onClick={() => {
+                setLoginMessage("");
+                setPage("welcome");
+              }}
             >
               Back to Home
             </button>
 
           </div>
+
         </div>
       )}
 
       {page === "signup" && (
-        <div className="form-page">
+        <div className="page-container">
+
           <div className="form-card">
 
-            <h2 className="sign-up-title">
-              Create an Account
-            </h2>
+            <div className="clinic-logo">
+              🐾
+            </div>
 
-            <p>
-              Sign up for ACME Vet Clinic.
+            <h1>
+              Create an Account
+            </h1>
+
+            <p className="form-subtitle">
+              Sign up for ACME Vet Clinic
             </p>
 
-            <form onSubmit={handleSignupSubmit}>
+            <form
+              onSubmit={handleSignupSubmit}
+              className="clinic-form"
+            >
 
               <label>
                 Full Name
-              </label>
 
-              <input
-                type="text"
-                name="lname"
-                placeholder="Enter your name"
-                value={signupData.lname}
-                onChange={handleSignupChange}
-                required
-              />
+                <input
+                  name="lname"
+                  value={signupData.lname}
+                  onChange={handleSignupChange}
+                  type="text"
+                  required
+                />
+              </label>
 
               <label>
                 Username
-              </label>
 
-              <input
-                type="text"
-                name="lusername"
-                placeholder="Create a username"
-                value={signupData.lusername}
-                onChange={handleSignupChange}
-                required
-              />
+                <input
+                  name="lusername"
+                  value={signupData.lusername}
+                  onChange={handleSignupChange}
+                  type="text"
+                  required
+                />
+              </label>
 
               <label>
                 Role
+
+                <select
+                  name="role"
+                  value={signupData.role}
+                  onChange={handleSignupChange}
+                  required
+                >
+                  <option value="">
+                    Select a role
+                  </option>
+
+                  <option value="hr">
+                    HR
+                  </option>
+
+                  <option value="doctor">
+                    Doctor
+                  </option>
+
+                  <option value="technician">
+                    Technician
+                  </option>
+                </select>
               </label>
-
-              <select
-                name="role"
-                value={signupData.role}
-                onChange={handleSignupChange}
-                required
-              >
-                <option value="" disabled>
-                  Select your role
-                </option>
-
-                <option value="hr">
-                  HR
-                </option>
-
-                <option value="doctor">
-                  Doctor
-                </option>
-
-                <option value="technician">
-                  Technician
-                </option>
-              </select>
 
               <label>
                 Email
-              </label>
 
-              <input
-                type="email"
-                name="lemail"
-                placeholder="Enter your email"
-                value={signupData.lemail}
-                onChange={handleSignupChange}
-                required
-              />
+                <input
+                  name="lemail"
+                  value={signupData.lemail}
+                  onChange={handleSignupChange}
+                  type="email"
+                  required
+                />
+              </label>
 
               <label>
                 Password
+
+                <input
+                  name="lpassword"
+                  value={signupData.lpassword}
+                  onChange={handleSignupChange}
+                  type="password"
+                  required
+                />
               </label>
 
-              <input
-                type="password"
-                name="lpassword"
-                placeholder="Create a password"
-                value={signupData.lpassword}
-                onChange={handleSignupChange}
-                required
-              />
-
               <button
-                className="primary-button"
                 type="submit"
+                className="primary-button"
               >
                 Sign Up
               </button>
@@ -323,25 +372,33 @@ const handleLoginSubmit = async (event) => {
             </form>
 
             {signupMessage && (
-              <p className="signup-message">
+              <p className="form-message">
                 {signupMessage}
               </p>
             )}
 
             <button
-              className="back-button"
-              onClick={() => setPage("welcome")}
+              className="secondary-button"
+              onClick={() => {
+                setSignupMessage("");
+                setPage("welcome");
+              }}
             >
               Back to Home
             </button>
 
           </div>
+
         </div>
       )}
 
       {page === "doctor" && (
-        <DoctorDashboard />
+        <DoctorDashboard
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
       )}
+
     </div>
   );
 }

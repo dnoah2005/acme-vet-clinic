@@ -11,61 +11,60 @@ body {
 }
 
 button,
-input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
+input,
+select {
+  font-family: inherit;
 }
 
 .app {
   min-height: 100vh;
 }
 
-.welcome-page,
-.form-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.page-container {
   min-height: 100vh;
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
 }
 
 .welcome-card,
 .form-card {
   width: 100%;
   max-width: 450px;
-  padding: 40px;
-  border-radius: 16px;
   background: white;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   text-align: center;
 }
 
-.logo {
-  font-size: 56px;
-  margin-bottom: 20px;
+.clinic-logo {
+  font-size: 48px;
+  margin-bottom: 10px;
 }
 
-h1 {
-  margin: 0 0 16px;
-  font-size: 32px;
-  line-height: 1.2;
+.welcome-card h1,
+.form-card h1 {
+  color: #263238;
+  margin: 0 0 15px 0;
+  font-size: 30px;
 }
 
-h2 {
-  margin: 0 0 16px;
-  font-size: 28px;
+.welcome-subtitle,
+.form-subtitle {
+  color: #607d82;
+  margin: 0 0 25px 0;
+  font-size: 16px;
 }
 
-p {
-  margin-bottom: 28px;
-  color: #607d8b;
-  line-height: 1.5;
+.backend-message {
+  color: #546e7a;
+  font-size: 14px;
+  margin-bottom: 25px;
 }
 
-.button-container {
+.welcome-buttons {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -74,118 +73,98 @@ p {
 .primary-button,
 .secondary-button {
   width: 100%;
-  padding: 13px 20px;
-  border-radius: 8px;
-  font-weight: bold;
-  transition: background 0.2s;
+  padding: 12px 18px;
+  border-radius: 7px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .primary-button {
-  border: none;
   background: #2c7a7b;
   color: white;
+  border: 2px solid #2c7a7b;
 }
 
 .primary-button:hover {
-  background: #225e5f;
+  background: #225f60;
+  border-color: #225f60;
 }
 
 .secondary-button {
-  border: 2px solid #2c7a7b;
   background: white;
   color: #2c7a7b;
+  border: 2px solid #2c7a7b;
+  margin-top: 12px;
 }
 
 .secondary-button:hover {
   background: #eef6f7;
 }
 
-.form-card {
-  text-align: left;
-}
-
-.form-card p {
-  margin-bottom: 24px;
-}
-
-form {
+.clinic-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  text-align: left;
+  gap: 16px;
 }
 
-label {
+.clinic-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
   font-weight: bold;
-  font-size: 14px;
-  margin-top: 8px;
+  color: #37474f;
 }
 
-input {
+.clinic-form input,
+.clinic-form select {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #f0f8ff;
-  color: #263238;
-}
-
-input:focus {
-  outline: 2px solid #2c7a7b;
-  border-color: #2c7a7b;
-}
-
-form .primary-button {
-  margin-top: 16px;
-}
-
-.back-button {
-  display: block;
-  width: 100%;
-  margin-top: 20px;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: #2c7a7b;
-  font-weight: bold;
-  text-align: center;
-}
-
-.back-button:hover {
-  text-decoration: underline;
-}
-.clinic-title {
-  color: #2c7a7b;
-}
-.sign-up-title {
-  color: #2c7a7b;
-}
-.login-title {
-  color: #2c7a7b;
-}
-select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 11px;
+  border: 1px solid #b0bec5;
+  border-radius: 6px;
+  font-size: 15px;
   background: white;
-  color: #263238;
-  font: inherit;
-}
-input::placeholder {
-  color: #333333;
+  color: #000000;
+  -webkit-text-fill-color: #000000;
 }
 
-select:focus {
-  outline: 2px solid #2c7a7b;
-  border-color: #2c7a7b;
+.clinic-form input::placeholder {
+  color: #777777;
+  opacity: 1;
 }
-@media (max-width: 480px) {
-  .welcome-card,
-  .form-card {
-    padding: 28px 24px;
+
+.clinic-form input:focus,
+.clinic-form select:focus {
+  outline: none;
+  border-color: #2c7a7b;
+  box-shadow: 0 0 0 2px rgba(44, 122, 123, 0.15);
+  color: #000000;
+}
+
+.clinic-form select option {
+  color: #000000;
+  background: white;
+}
+
+.form-message {
+  margin-top: 18px;
+  color: #2c7a7b;
+  font-weight: bold;
+}
+
+@media (max-width: 500px) {
+  .page-container {
+    padding: 15px;
   }
 
-  h1 {
-    font-size: 26px;
+  .welcome-card,
+  .form-card {
+    padding: 30px 22px;
+  }
+
+  .welcome-card h1,
+  .form-card h1 {
+    font-size: 25px;
   }
 }

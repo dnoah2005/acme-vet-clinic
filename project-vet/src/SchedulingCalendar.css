@@ -1,104 +1,244 @@
 
 .scheduling-calendar-page {
   width: 100%;
-  min-height: 100vh;
-  padding: 30px 40px 40px;
-  box-sizing: border-box;
-  background-color: white;
-  color: black;
 }
 
 .scheduling-calendar-page h1 {
   text-align: center;
-  color: black;
-  margin: 0 0 25px;
-  font-size: 32px;
+  color: #263238;
+  font-size: 30px;
+  margin: 0 0 15px 0;
+  font-weight: bold;
+}
+
+.scheduling-instructions {
+  text-align: center;
+  color: #455a64;
+  margin: 5px 0;
 }
 
 .scheduling-calendar-navigation {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 25px;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 30px;
+  margin: 25px 0 20px 0;
 }
 
 .scheduling-calendar-navigation h2 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
   min-width: 220px;
   text-align: center;
-  color: black !important;
+  margin: 0;
+  color: #263238;
+  font-weight: bold;
+  font-size: 24px;
 }
 
 .scheduling-calendar-arrow {
-  border: none;
-  background: none;
-  color: black;
-  font-size: 38px;
+  width: 50px;
+  height: 42px;
+  border: 2px solid #263238;
+  border-radius: 6px;
+  background: #37474f;
+  color: white;
+  font-size: 27px;
   font-weight: bold;
-  cursor: pointer;
   line-height: 1;
-  padding: 5px 15px;
-}
-
-.scheduling-calendar-arrow:hover {
-  color: #666666;
-}
-
-.scheduling-calendar-page .fc {
-  width: 100%;
-}
-
-.scheduling-calendar-page .scheduling-day-header {
-  border: 1px solid #999 !important;
-  background-color: #f2f2f2 !important;
-  color: black !important;
-  font-weight: bold;
-  padding: 12px 5px;
-}
-
-.scheduling-calendar-page .scheduling-calendar-cell {
-  border: 1px solid #999 !important;
-  background-color: white;
-}
-
-.scheduling-calendar-page .scheduling-calendar-today {
-  background-color: #fffdf0 !important;
-}
-
-.scheduling-calendar-page .scheduling-day-number {
-  color: black !important;
-  font-size: 16px;
-  font-weight: 500;
-  padding: 10px;
-}
-
-.scheduling-calendar-page .scheduling-day-number-today {
-  background-color: #ffd84d !important;
-  color: black !important;
-  font-weight: 700 !important;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 6px;
-  padding: 0;
-  box-sizing: border-box;
+}
+
+.scheduling-calendar-arrow:hover {
+  background: #1f292d;
+}
+
+.scheduling-calendar-cell {
+  cursor: pointer;
+  border: 1px solid #d5d5d5;
+}
+
+.scheduling-calendar-cell:hover {
+  background-color: #f1f5f6;
+}
+
+.scheduling-day-header {
+  font-weight: bold;
+  color: #263238;
+}
+
+.scheduling-calendar-today {
+  background-color: #fffdf0;
+}
+
+.scheduling-day-number {
+  font-weight: bold;
+}
+
+.scheduling-day-number-today {
+  background-color: #facc15 !important;
+  color: #263238 !important;
+  border-radius: 50%;
   box-shadow:
-    0 0 5px #ffd84d,
-    0 0 10px #ffd84d,
-    0 0 18px rgba(255, 216, 77, 0.9);
+    0 0 6px rgba(250, 204, 21, 0.8),
+    0 0 14px rgba(250, 204, 21, 0.6);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
-.scheduling-calendar-page .fc table {
-  border-collapse: collapse !important;
+.scheduled-day-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white !important;
+  margin: 3px;
 }
 
-.scheduling-calendar-page .fc td,
-.scheduling-calendar-page .fc th {
-  border: 1px solid #999 !important;
+.scheduled-early_morning
+  .fc-daygrid-day-number {
+  background-color: #16a34a !important;
+  color: white !important;
+}
+
+.scheduled-eight_thirty
+  .fc-daygrid-day-number {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+.scheduled-late_doctor
+  .fc-daygrid-day-number {
+  background-color: #ea580c !important;
+  color: white !important;
+}
+
+.scheduled-surgery
+  .fc-daygrid-day-number {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+.scheduled-overnight
+  .fc-daygrid-day-number {
+  background-color: #7c3aed !important;
+  color: white !important;
+}
+
+.scheduled-sunday
+  .fc-daygrid-day-number {
+  background-color: #0891b2 !important;
+  color: white !important;
+}
+
+.schedule-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.schedule-modal {
+  background: white;
+  width: 440px;
+  max-width: 90%;
+  padding: 32px;
+  border-radius: 14px;
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.schedule-modal h2 {
+  margin: 0 0 15px 0;
+  color: #263238;
+}
+
+.schedule-modal p {
+  color: #455a64;
+  margin-bottom: 20px;
+}
+
+.shift-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  font-size: 15px;
+  background: white !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+  margin-bottom: 15px;
+}
+
+.shift-select option {
+  background: white !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+}
+
+.shift-select:focus {
+  outline: none;
+  border-color: #2c7a7b;
+  box-shadow:
+    0 0 0 2px rgba(
+      44,
+      122,
+      123,
+      0.15
+    );
+}
+
+.schedule-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.schedule-modal button {
+  padding: 11px 20px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-primary-button {
+  background: #2c7a7b;
+  color: white;
+  border: 2px solid #2c7a7b;
+}
+
+.modal-primary-button:hover {
+  background: #225f60;
+}
+
+.modal-secondary-button {
+  background: white;
+  color: #2c7a7b;
+  border: 2px solid #2c7a7b;
+}
+
+.modal-secondary-button:hover {
+  background: #eef6f7;
+}
+
+.schedule-error {
+  color: #dc2626 !important;
+  font-weight: bold;
 }

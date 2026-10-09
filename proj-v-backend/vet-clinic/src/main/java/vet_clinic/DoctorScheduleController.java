@@ -14,15 +14,18 @@ public class DoctorScheduleController {
     private final DoctorScheduleRepository scheduleRepository;
     private final DoctorRepository doctorRepository;
     private final LoginRepository loginRepository;
+    private final DoctorTimeOffRepository timeOffRepository;
 
     public DoctorScheduleController(
             DoctorScheduleRepository scheduleRepository,
             DoctorRepository doctorRepository,
-            LoginRepository loginRepository
+            LoginRepository loginRepository,
+            DoctorTimeOffRepository timeOffRepository
     ) {
         this.scheduleRepository = scheduleRepository;
         this.doctorRepository = doctorRepository;
         this.loginRepository = loginRepository;
+        this.timeOffRepository = timeOffRepository;
     }
 
     @GetMapping("/schedules")
@@ -71,13 +74,28 @@ public class DoctorScheduleController {
                     .body("Date and shift are required.");
         }
 
+        LocalDate today = LocalDate.now();
+
         LocalDate earliestDate =
-                LocalDate.now().plusDays(14);
+                today.plusDays(14);
 
         if (shiftDate.isBefore(earliestDate)) {
             return ResponseEntity.badRequest()
                     .body(
-                        "Schedules must be registered at least 2 weeks ahead."
+                            "Schedules must be registered at least 2 weeks ahead."
+                    );
+        }
+
+        if (timeOffRepository
+                .existsByDoctor_DoctorIdAndRequestDateAndStatus(
+                        doctorId,
+                        shiftDate,
+                        "APPROVED"
+                )) {
+
+            return ResponseEntity.badRequest()
+                    .body(
+                            "You cannot schedule a shift on a day when you have approved time off."
                     );
         }
 
@@ -130,7 +148,7 @@ public class DoctorScheduleController {
             if (surgeryCount >= 1) {
                 return ResponseEntity.badRequest()
                         .body(
-                            "You cannot have two surgery days in the same week."
+                                "You cannot have two surgery days in the same week."
                         );
             }
         }
@@ -149,7 +167,7 @@ public class DoctorScheduleController {
             if (overnightCount >= 1) {
                 return ResponseEntity.badRequest()
                         .body(
-                            "You cannot have two overnight shifts in the same week."
+                                "You cannot have two overnight shifts in the same week."
                         );
             }
         }
@@ -212,7 +230,7 @@ public class DoctorScheduleController {
 
                 return ResponseEntity.badRequest()
                         .body(
-                            "You must have at least 10 hours between shifts."
+                                "You must have at least 10 hours between shifts."
                         );
             }
         }
@@ -273,7 +291,6 @@ public class DoctorScheduleController {
 
         if ("LATE_DOCTOR".equals(shiftType)
                 && day == DayOfWeek.FRIDAY) {
-
             return 2;
         }
 

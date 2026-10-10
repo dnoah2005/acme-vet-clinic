@@ -1,0 +1,104 @@
+
+.scheduling-calendar-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px 40px 40px;
+  box-sizing: border-box;
+  background-color: white;
+  color: black;
+}
+
+.scheduling-calendar-page h1 {
+  text-align: center;
+  color: black;
+  margin: 0 0 25px;
+  font-size: 32px;
+}
+
+.scheduling-calendar-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.scheduling-calendar-navigation h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  min-width: 220px;
+  text-align: center;
+  color: black !important;
+}
+
+.scheduling-calendar-arrow {
+  border: none;
+  background: none;
+  color: black;
+  font-size: 38px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px 15px;
+}
+
+.scheduling-calendar-arrow:hover {
+  color: #666666;
+}
+
+.scheduling-calendar-page .fc {
+  width: 100%;
+}
+
+.scheduling-calendar-page .scheduling-day-header {
+  border: 1px solid #999 !important;
+  background-color: #f2f2f2 !important;
+  color: black !important;
+  font-weight: bold;
+  padding: 12px 5px;
+}
+
+.scheduling-calendar-page .scheduling-calendar-cell {
+  border: 1px solid #999 !important;
+  background-color: white;
+}
+
+.scheduling-calendar-page .scheduling-calendar-today {
+  background-color: #fffdf0 !important;
+}
+
+.scheduling-calendar-page .scheduling-day-number {
+  color: black !important;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.scheduling-calendar-page .scheduling-day-number-today {
+  background-color: #ffd84d !important;
+  color: black !important;
+  font-weight: 700 !important;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px;
+  padding: 0;
+  box-sizing: border-box;
+  box-shadow:
+    0 0 5px #ffd84d,
+    0 0 10px #ffd84d,
+    0 0 18px rgba(255, 216, 77, 0.9);
+}
+
+.scheduling-calendar-page .fc table {
+  border-collapse: collapse !important;
+}
+
+.scheduling-calendar-page .fc td,
+.scheduling-calendar-page .fc th {
+  border: 1px solid #999 !important;
+}

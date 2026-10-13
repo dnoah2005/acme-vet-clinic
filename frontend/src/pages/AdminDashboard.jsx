@@ -20,6 +20,6 @@ function AdminDashboard() {
       </div>
     </div>
   );
-}
+}x
 
 export default AdminDashboard;

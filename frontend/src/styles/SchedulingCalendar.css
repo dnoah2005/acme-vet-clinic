@@ -1,0 +1,459 @@
+.scheduling-calendar-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 30px 40px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #263238;
+}
+
+.scheduling-page-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.scheduling-eyebrow {
+  color: #1f5f60;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.scheduling-page-header h1 {
+  margin: 7px 0 8px;
+  color: #263238;
+  font-size: 32px;
+}
+
+.scheduling-page-header p {
+  margin: 0;
+  color: #526168;
+}
+
+.time-off-balance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.time-off-balance-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  background: #f8fafb;
+  box-shadow: 0 2px 7px rgba(38, 50, 56, .05);
+}
+
+.vacation-card .balance-card-heading h2,
+.sick-card .balance-card-heading h2 {
+  color: #0f172a;
+}
+
+.balance-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.balance-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #e0f2f1;
+  color: #1f5f60;
+  font-size: 22px;
+}
+
+.balance-card-heading h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.balance-card-heading p {
+  margin: 4px 0 0;
+  color: #607078;
+  font-size: 13px;
+}
+
+.balance-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.balance-number-row strong {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.balance-number-row span {
+  color: #526168;
+}
+
+.balance-progress-track {
+  height: 7px;
+  margin-top: 14px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e1e8eb;
+}
+
+.balance-progress {
+  height: 100%;
+  border-radius: inherit;
+  transition: width .2s ease;
+}
+
+.vacation-progress {
+  background: #0f9f83;
+}
+
+.sick-progress {
+  background: #2563eb;
+}
+
+.balance-usage {
+  margin: 8px 0 14px;
+  color: #607078;
+  font-size: 13px;
+}
+
+.time-off-button,
+.confirm-time-off-button,
+.cancel-mode-button,
+.dismiss-result-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.time-off-button {
+  color: white;
+}
+
+.vacation-button {
+  background: #1f7668;
+}
+
+.sick-button {
+  background: #2563eb;
+}
+
+.time-off-button:disabled,
+.confirm-time-off-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.time-off-mode-panel,
+.time-off-result,
+.scheduling-instructions,
+.selected-date-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 16px 0;
+  padding: 15px 18px;
+  border: 1px solid #d7e0e3;
+  border-radius: 8px;
+  background: #f8fafb;
+}
+
+.time-off-mode-panel p,
+.time-off-result p,
+.scheduling-instructions p {
+  margin: 5px 0 0;
+  color: #526168;
+  line-height: 1.45;
+}
+
+.cancel-mode-button,
+.dismiss-result-button {
+  background: #e4eaed;
+  color: #263238;
+  flex-shrink: 0;
+}
+
+.time-off-result-valid {
+  border-color: #83c7b7;
+  background: #effaf6;
+}
+
+.confirm-time-off-button {
+  background: #1f7668;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.scheduling-instructions {
+  display: block;
+}
+
+.calendar-panel {
+  padding: 18px;
+  border: 1px solid #d7e0e3;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.scheduling-calendar-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  margin-bottom: 18px;
+}
+
+.scheduling-calendar-navigation h2 {
+  min-width: 220px;
+  margin: 0;
+  color: #263238;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.scheduling-calendar-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 40px;
+  border: 1px solid #263238;
+  border-radius: 6px;
+  background: #37474f;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scheduling-calendar-arrow:hover {
+  background: #1f292d;
+}
+
+.scheduling-calendar-arrow:focus-visible,
+.time-off-button:focus-visible,
+.confirm-time-off-button:focus-visible {
+  outline: 3px solid #80deea;
+  outline-offset: 2px;
+}
+
+.scheduling-calendar-page .fc {
+  width: 100%;
+  min-height: 320px;
+  color: #263238;
+}
+
+.scheduling-calendar-page .fc .fc-view-harness,
+.scheduling-calendar-page .fc .fc-daygrid,
+.scheduling-calendar-page .fc .fc-scrollgrid,
+.scheduling-calendar-page .fc .fc-scrollgrid table {
+  width: 100%;
+}
+
+.scheduling-calendar-page .fc .fc-scrollgrid {
+  border-collapse: collapse;
+  border: 1px solid #cbd5e1;
+}
+
+.scheduling-calendar-page .fc .fc-col-header-cell,
+.scheduling-calendar-page .fc .fc-daygrid-day {
+  border: 1px solid #cbd5e1;
+}
+
+.scheduling-calendar-page .fc .fc-daygrid-day-frame {
+  min-height: 90px;
+}
+
+.scheduling-calendar-page .fc .fc-daygrid-day-number {
+  padding: 7px;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.scheduling-calendar-page .fc .fc-daygrid-day-events {
+  min-height: 24px;
+}
+
+.scheduling-calendar-page .fc .fc-event {
+  border-radius: 4px;
+  padding: 1px 2px;
+  white-space: normal;
+}
+
+.scheduling-calendar-page .scheduling-day-header {
+  border: 1px solid #d5dfe2 !important;
+  background: #f2f6f7 !important;
+  color: #263238 !important;
+  font-weight: 700;
+  padding: 10px 5px;
+}
+
+.scheduling-calendar-page .scheduling-calendar-cell {
+  border: 1px solid #d5dfe2 !important;
+  background: #fff;
+  cursor: pointer;
+}
+
+.scheduling-calendar-page .scheduling-calendar-cell:hover {
+  background: #f1f7f8;
+}
+
+.scheduling-calendar-page .scheduling-calendar-today {
+  background: #fffdf0 !important;
+}
+
+.scheduling-calendar-page .time-off-selectable {
+  cursor: crosshair;
+}
+
+.scheduling-calendar-page .selected-time-off-date {
+  background: #d9f4e8 !important;
+  box-shadow: inset 0 0 0 2px #16856b;
+}
+
+.scheduling-event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  padding: 2px 3px;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.scheduling-event-content strong {
+  overflow-wrap: anywhere;
+}
+
+.scheduling-event-content span {
+  font-size: 11px;
+}
+
+.calendar-mode-hint,
+.calendar-status,
+.calendar-error {
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.calendar-mode-hint,
+.calendar-status {
+  color: #263238;
+  background: #f3f6f7;
+}
+
+.calendar-error {
+  color: #8b1e1e;
+  background: #fff1f1;
+}
+
+.selected-date-panel {
+  display: block;
+}
+
+.selected-date-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-date-heading h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.selected-shift-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e0e6e8;
+  border-radius: 7px;
+}
+
+.selected-shift-dot {
+  width: 13px;
+  height: 13px;
+  margin-top: 5px;
+  border-radius: 50%;
+  flex: 0 0 13px;
+}
+
+.selected-shift-card p {
+  margin: 5px 0 0;
+  color: #526168;
+}
+
+@media (max-width: 760px) {
+  .scheduling-calendar-page {
+    padding: 18px 10px 28px;
+  }
+
+  .time-off-balance {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-panel {
+    padding: 10px;
+  }
+
+  .scheduling-calendar-navigation {
+    gap: 12px;
+  }
+
+  .scheduling-calendar-navigation h2 {
+    min-width: 0;
+    font-size: 20px;
+  }
+
+  .time-off-mode-panel,
+  .time-off-result {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.work-request-button {
+  display: inline-flex;
+  width: auto;
+  margin-top: 12px;
+  background: #334155;
+}
+
+.work-request-button:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.work-shift-type-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.work-shift-type-select {
+  width: min(100%, 320px);
+  padding: 10px 12px;
+  border: 1px solid #94a3b8;
+  border-radius: 7px;
+  color: #0f172a;
+  background: #fff;
+  font: inherit;
+}

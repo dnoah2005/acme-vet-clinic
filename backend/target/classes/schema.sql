@@ -59,3 +59,4 @@
     CREATE INDEX IF NOT EXISTS assignment_user_idx ON shift_assignment(uid);
     CREATE INDEX IF NOT EXISTS shift_start_idx ON schedule_shift(start_at);
     CREATE INDEX IF NOT EXISTS request_user_date_idx ON time_off_request(uid,start_date,end_date);
+/* dummy push

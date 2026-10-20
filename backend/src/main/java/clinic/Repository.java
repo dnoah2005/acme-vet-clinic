@@ -513,4 +513,27 @@ class Repository {
                 r -> r.getInt(1))
                 .getFirst();
     }
+
+    List<ApprovedWorkShiftRequest> approvedWorkRequests(
+            LocalDate start,
+            LocalDate end,
+            Role role) {
+
+        return query(
+                "select w.uid,w.work_date,w.shift_type " +
+                "from work_shift_request w " +
+                "join app_user u on u.uid=w.uid " +
+                "where w.work_date between ? and ? " +
+                "and w.status='APPROVED' and u.role=? and u.active=true " +
+                "order by w.submitted_at,w.wrid",
+                s -> {
+                    s.setObject(1, start);
+                    s.setObject(2, end);
+                    s.setString(3, role.name());
+                },
+                r -> new ApprovedWorkShiftRequest(
+                        r.getLong("uid"),
+                        r.getObject("work_date", LocalDate.class),
+                        ShiftType.valueOf(r.getString("shift_type"))));
+    }
 }

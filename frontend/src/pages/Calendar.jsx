@@ -129,6 +129,7 @@ function Calendar({ currentUser }) {
           {
             headers: {
               "X-User-Id": String(currentUser.id),
+              "X-Auth-Token": currentUser.authToken,
             },
           }
         );
@@ -296,7 +297,7 @@ function Calendar({ currentUser }) {
           onClick={handlePrevious}
           className="calendar-arrow"
           type="button"
-          aria-label="Previous month"
+          aria-label="Previous two weeks"
         >
           ←
         </button>
@@ -307,7 +308,7 @@ function Calendar({ currentUser }) {
           onClick={handleNext}
           className="calendar-arrow"
           type="button"
-          aria-label="Next month"
+          aria-label="Next two weeks"
         >
           →
         </button>
@@ -328,7 +329,13 @@ function Calendar({ currentUser }) {
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
+        initialView="twoWeek"
+        views={{
+          twoWeek: {
+            type: "dayGrid",
+            duration: { weeks: 2 },
+          },
+        }}
         headerToolbar={false}
         showNonCurrentDates={false}
         fixedWeekCount={false}

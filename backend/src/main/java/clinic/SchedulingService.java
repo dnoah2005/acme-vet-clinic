@@ -146,31 +146,92 @@ class SchedulingService {
             }
         }
 
+        Map<Long, Integer> assignedCounts = new HashMap<>();
+        LocalDate weekStart = shifts.getFirst().startAt()
+            .atZoneSameInstant(CLINIC_ZONE)
+            .toLocalDate();
+
+        for (User person : people) {
+            for (Shift existing : repo.assignedShiftsForUser(person.id())) {
+            LocalDate existingWeek = existing.startAt()
+                .atZoneSameInstant(CLINIC_ZONE)
+                .toLocalDate()
+                .with(TemporalAdjusters.previousOrSame(
+                    DayOfWeek.MONDAY));
+
+            if (!existingWeek.equals(weekStart)) {
+                work.computeIfAbsent(
+                    person.id(),
+                    x -> new ArrayList<>())
+                    .add(existing);
+            }
+            }
+        }
+
+        for (ApprovedWorkShiftRequest request :
+            repo.approvedWorkRequests(
+                weekStart,
+                weekStart.plusDays(6),
+                role)) {
+
+            Shift shift = shifts.stream()
+                .filter(s -> s.shiftType() == request.shiftType())
+                .filter(s -> s.startAt()
+                    .atZoneSameInstant(CLINIC_ZONE)
+                    .toLocalDate()
+                    .equals(request.workDate()))
+                .findFirst()
+                .orElse(null);
+
+            User candidate = people.stream()
+                .filter(p -> p != null
+                    && p.id() == request.userId()
+                    && p.active())
+                .findFirst()
+                .orElse(null);
+
+            if (shift == null || candidate == null
+                || assignedCounts.getOrDefault(shift.id(), 0)
+                    >= requiredStaff(shift, role)
+                || !eligible(
+                    candidate,
+                    shift,
+                    role,
+                    work,
+                    surgeryThisWeek,
+                    overnightThisWeek)) {
+            return false;
+            }
+
+            repo.assign(shift.id(), candidate.id());
+            work.computeIfAbsent(
+                candidate.id(),
+                x -> new ArrayList<>()).add(shift);
+            loads.merge(candidate.id(), 1, Integer::sum);
+            assignedCounts.merge(shift.id(), 1, Integer::sum);
+            recordWeeklyShift(
+                candidate,
+                shift,
+                role,
+                surgeryThisWeek,
+                overnightThisWeek);
+        }
+
         for (Shift shift : shifts) {
-            int needed = role == Role.DOCTOR
-                    ? shift.requiredDoctors()
-                    : shift.requiredTechnicians();
+            int needed = requiredStaff(shift, role)
+                - assignedCounts.getOrDefault(shift.id(), 0);
 
             for (int slot = 0; slot < needed; slot++) {
                 User candidate = people.stream()
                         .filter(p -> p != null && p.active())
                         .filter(p -> loads.containsKey(p.id()))
-                        .filter(p -> !repo.timeOff(
-                                p.id(),
-                                shift.startAt()
-                                        .atZoneSameInstant(CLINIC_ZONE)
-                                        .toLocalDate()
-                        ))
-                        .filter(p -> !conflicts(
-                                work.getOrDefault(p.id(), List.of()),
-                                shift
-                        ))
-                        .filter(p -> role != Role.DOCTOR
-                                || shift.shiftType() != ShiftType.SURGERY
-                                || !surgeryThisWeek.contains(p.id()))
-                        .filter(p -> role != Role.DOCTOR
-                                || shift.shiftType() != ShiftType.OVERNIGHT
-                                || !overnightThisWeek.contains(p.id()))
+                .filter(p -> eligible(
+                    p,
+                    shift,
+                    role,
+                    work,
+                    surgeryThisWeek,
+                    overnightThisWeek))
                         .min(
                                 Comparator.comparingInt(
                                         (User p) -> loads.get(p.id())
@@ -190,20 +251,72 @@ class SchedulingService {
                 ).add(shift);
 
                 loads.merge(candidate.id(), 1, Integer::sum);
-
-                if (role == Role.DOCTOR
-                        && shift.shiftType() == ShiftType.SURGERY) {
-                    surgeryThisWeek.add(candidate.id());
-                }
-
-                if (role == Role.DOCTOR
-                        && shift.shiftType() == ShiftType.OVERNIGHT) {
-                    overnightThisWeek.add(candidate.id());
-                }
+                assignedCounts.merge(shift.id(), 1, Integer::sum);
+                recordWeeklyShift(
+                        candidate,
+                        shift,
+                        role,
+                        surgeryThisWeek,
+                        overnightThisWeek);
             }
         }
 
         return true;
+    }
+
+    private boolean eligible(
+            User candidate,
+            Shift shift,
+            Role role,
+            Map<Long, List<Shift>> work,
+            Set<Long> surgeryThisWeek,
+            Set<Long> overnightThisWeek) {
+
+        LocalDate shiftStart = shift.startAt()
+            .atZoneSameInstant(CLINIC_ZONE)
+            .toLocalDate();
+        LocalDate shiftEnd = shift.endAt()
+            .minusNanos(1)
+            .atZoneSameInstant(CLINIC_ZONE)
+            .toLocalDate();
+
+        return !repo.approvedTimeOffOverlaps(
+                candidate.id(),
+                shiftStart,
+                shiftEnd)
+                && !conflicts(
+                        work.getOrDefault(candidate.id(), List.of()),
+                        shift)
+                && (role != Role.DOCTOR
+                        || shift.shiftType() != ShiftType.SURGERY
+                        || !surgeryThisWeek.contains(candidate.id()))
+                && (role != Role.DOCTOR
+                        || shift.shiftType() != ShiftType.OVERNIGHT
+                        || !overnightThisWeek.contains(candidate.id()));
+    }
+
+    private int requiredStaff(Shift shift, Role role) {
+        return role == Role.DOCTOR
+                ? shift.requiredDoctors()
+                : shift.requiredTechnicians();
+    }
+
+    private void recordWeeklyShift(
+            User candidate,
+            Shift shift,
+            Role role,
+            Set<Long> surgeryThisWeek,
+            Set<Long> overnightThisWeek) {
+
+        if (role == Role.DOCTOR
+                && shift.shiftType() == ShiftType.SURGERY) {
+            surgeryThisWeek.add(candidate.id());
+        }
+
+        if (role == Role.DOCTOR
+                && shift.shiftType() == ShiftType.OVERNIGHT) {
+            overnightThisWeek.add(candidate.id());
+        }
     }
 
     private boolean conflicts(List<Shift> assigned, Shift proposed) {

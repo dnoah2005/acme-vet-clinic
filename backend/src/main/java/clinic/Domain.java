@@ -34,11 +34,17 @@ record Shift(
 
 record Assignment(long shiftId, long userId) {}
 
+record ApprovedWorkShiftRequest(
+        long userId,
+        LocalDate workDate,
+        ShiftType shiftType
+) {}
+
 record Decision(boolean granted, String reason) {}
 
 record LoginRequest(String username, String password) {}
 
-record LoginResponse(User user) {}
+record LoginResponse(User user, String token) {}
 
 record NewUser(
         String username,

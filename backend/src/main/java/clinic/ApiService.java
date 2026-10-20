@@ -19,14 +19,20 @@ class ApiService {
     private final Repository repo;
     private final SchedulingService scheduler;
     private final PasswordEncoder passwords;
+        private final AuthSessions sessions;
 
-    ApiService(Repository r, SchedulingService s, PasswordEncoder p) {
+        ApiService(
+                        Repository r,
+                        SchedulingService s,
+                        PasswordEncoder p,
+                        AuthSessions sessions) {
         repo = r;
         scheduler = s;
         passwords = p;
+                this.sessions = sessions;
     }
 
-    User login(LoginRequest input) {
+        LoginResponse login(LoginRequest input) {
         if (input == null
                 || input.username() == null
                 || input.password() == null) {
@@ -44,8 +50,12 @@ class ApiService {
             throw new ApiException(401, "Invalid username or password");
         }
 
-        return u;
+        return new LoginResponse(u, sessions.issue(u.id()));
     }
+
+        void logout(String token) {
+                sessions.revoke(token);
+        }
 
     List<User> users(long actor) {
         requireAdmin(actor);
@@ -323,6 +333,10 @@ class ApiService {
 
         LocalDate lastMonday = end.with(
                 TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        if (start.equals(firstMonday)) {
+            firstMonday = firstMonday.minusWeeks(1);
+        }
 
         long requestId =
                 repo.addRequest(actor, input, true, "Request granted");

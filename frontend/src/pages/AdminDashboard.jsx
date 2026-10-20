@@ -95,6 +95,7 @@ function AdminDashboard({ currentUser, onLogout }) {
     () => ({
       "Content-Type": "application/json",
       "X-User-Id": String(user?.id ?? ""),
+      "X-Auth-Token": user?.authToken ?? "",
     }),
     [user]
   );
@@ -253,6 +254,27 @@ function AdminDashboard({ currentUser, onLogout }) {
       setBusy(false);
     }
   }, [api, employees, from, to, selectedEmployee]);
+
+  const generateSchedule = async () => {
+    setBusy(true);
+    setError("");
+    setMessage("");
+
+    try {
+      await api("/admin/schedule/generate", { method: "POST" });
+      setScheduleRows([]);
+      setMessage(
+        "The current week and next week were generated. Load the schedule below to review assignments."
+      );
+    } catch (e) {
+      setError(
+        e.message ||
+          "Could not generate a complete two-week schedule. Verify that enough active staff are available."
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!user || user.role !== "ADMIN") {
@@ -780,7 +802,22 @@ function AdminDashboard({ currentUser, onLogout }) {
                 shifts. Surgery shifts are highlighted.
               </p>
             </div>
+
+            <button
+              className="hr-button"
+              onClick={generateSchedule}
+              disabled={busy}
+              type="button"
+            >
+              {busy ? "Generating…" : "Generate current + next week"}
+            </button>
           </div>
+
+          <p className="hr-footnote">
+            Generate the schedule after creating the active roster and
+            whenever you need a fresh two-week schedule. Generation keeps
+            approved work-shift and time-off requests in effect.
+          </p>
 
           <div className="hr-filters">
             <label>

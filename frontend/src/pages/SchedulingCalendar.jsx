@@ -117,8 +117,9 @@ function SchedulingCalendar({ currentUser }) {
   const requestHeaders = useCallback(
     () => ({
       "X-User-Id": String(userId),
+      "X-Auth-Token": currentUser?.authToken ?? "",
     }),
-    [userId]
+    [currentUser?.authToken, userId]
   );
 
   const loadSchedules = useCallback(
@@ -932,7 +933,7 @@ function SchedulingCalendar({ currentUser }) {
             onClick={handlePrevious}
             className="scheduling-calendar-arrow"
             type="button"
-            aria-label="Previous month"
+            aria-label="Previous two weeks"
           >
             ←
           </button>
@@ -943,7 +944,7 @@ function SchedulingCalendar({ currentUser }) {
             onClick={handleNext}
             className="scheduling-calendar-arrow"
             type="button"
-            aria-label="Next month"
+            aria-label="Next two weeks"
           >
             →
           </button>
@@ -976,7 +977,13 @@ function SchedulingCalendar({ currentUser }) {
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          initialView="twoWeek"
+          views={{
+            twoWeek: {
+              type: "dayGrid",
+              duration: { weeks: 2 },
+            },
+          }}
           headerToolbar={false}
           showNonCurrentDates={true}
           fixedWeekCount={false}

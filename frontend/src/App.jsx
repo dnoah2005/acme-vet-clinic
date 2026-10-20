@@ -31,7 +31,14 @@ function readSavedUser() {
       return null;
     }
 
-    return normalizeUser(JSON.parse(savedUser));
+    const user = normalizeUser(JSON.parse(savedUser));
+
+    if (!user?.authToken) {
+      localStorage.removeItem("acmeUser");
+      return null;
+    }
+
+    return user;
   } catch {
     localStorage.removeItem("acmeUser");
     return null;
@@ -116,8 +123,8 @@ function App() {
         return;
       }
 
-      if (!data.user) {
-        setLoginMessage("The server did not return a user account.");
+      if (!data.user || !data.token) {
+        setLoginMessage("The server did not return a valid login session.");
         return;
       }
 
@@ -146,6 +153,7 @@ function App() {
 
       const user = {
         ...returnedUser,
+        authToken: data.token,
         mustChangePassword: needsPasswordChange,
       };
 
@@ -200,6 +208,7 @@ function App() {
           headers: {
             "Content-Type": "application/json",
             "X-User-Id": String(currentUser.id),
+            "X-Auth-Token": currentUser.authToken,
           },
           body: JSON.stringify({
             password: newPassword,
@@ -246,6 +255,18 @@ function App() {
   };
 
   const handleLogout = () => {
+    if (currentUser?.id && currentUser?.authToken) {
+      fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "X-User-Id": String(currentUser.id),
+          "X-Auth-Token": currentUser.authToken,
+        },
+      }).catch((error) => {
+        console.error("Could not revoke login session:", error);
+      });
+    }
+
     localStorage.removeItem("acmeUser");
     setCurrentUser(null);
     setLoginMessage("");

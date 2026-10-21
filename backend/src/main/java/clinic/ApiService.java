@@ -349,12 +349,12 @@ class ApiService {
             return deny(
                     actor,
                     input,
-                    "we will be short on doctors or technicians if we grant your request");
+                    "Request Denied: we will be short on " + (requester.role() == Role.DOCTOR ? "doctors" : "technicians") + " if we grant your request");
         }
 
         return new Decision(
                 true,
-                "request granted; the schedule has been rearranged");
+                "Request Granted: the schedule has been rearranged");
     }
 
     @Transactional

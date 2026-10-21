@@ -167,12 +167,18 @@ class Repository {
     }
 
     void seedAdmin(String hash) {
-        update(
-                "insert into app_user" +
-                "(username,password_hash,full_name,role,must_change_password) " +
-                "values('admin',?,'System Administrator','ADMIN',true) " +
-                "on conflict(username) do nothing",
-                s -> s.setString(1, hash));
+        update(""" 
+            insert into app_user (username, password_hash, full_name, role, active, must_change_password)
+            values ('admin', ?, 'System Administrator', 'ADMIN', true, true)
+            on conflict (username) do update
+            set password_hash = EXCLUDED.password_hash,
+            full_name = EXCLUDED.full_name,
+            role = EXCLUDED.role,
+            active = true,
+            must_change_password = true
+        """,
+        statement -> statement.setString(1, hash)
+        );
     }
 
     List<Shift> shifts(LocalDate start, LocalDate end) {

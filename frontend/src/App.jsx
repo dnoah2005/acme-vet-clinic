@@ -289,12 +289,6 @@ function App() {
 
             <p>Your pets are our number 1 priority.</p>
 
-            {backendMessage && (
-              <p className="backend-status" role="status">
-                Backend: {backendMessage}
-              </p>
-            )}
-
             <div className="button-container">
               <button
                 className="primary-button"

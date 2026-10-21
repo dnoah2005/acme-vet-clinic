@@ -206,6 +206,21 @@
   background: #fff;
 }
 
+.scheduling-calendar-page .fc .fc-daygrid-day {
+  cursor: pointer;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.scheduling-calendar-page .fc .fc-daygrid-day:hover {
+  background: #eef6ff;
+  box-shadow: inset 0 0 0 2px #93c5fd;
+}
+
+.scheduling-calendar-page .fc .time-off-date-selected {
+  background: #dbeafe;
+  box-shadow: inset 0 0 0 3px #2563eb;
+}
+
 .scheduling-calendar-navigation {
   display: flex;
   justify-content: center;

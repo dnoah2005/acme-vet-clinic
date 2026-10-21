@@ -168,55 +168,6 @@ class SchedulingService {
             }
         }
 
-        for (ApprovedWorkShiftRequest request :
-            repo.approvedWorkRequests(
-                weekStart,
-                weekStart.plusDays(6),
-                role)) {
-
-            Shift shift = shifts.stream()
-                .filter(s -> s.shiftType() == request.shiftType())
-                .filter(s -> s.startAt()
-                    .atZoneSameInstant(CLINIC_ZONE)
-                    .toLocalDate()
-                    .equals(request.workDate()))
-                .findFirst()
-                .orElse(null);
-
-            User candidate = people.stream()
-                .filter(p -> p != null
-                    && p.id() == request.userId()
-                    && p.active())
-                .findFirst()
-                .orElse(null);
-
-            if (shift == null || candidate == null
-                || assignedCounts.getOrDefault(shift.id(), 0)
-                    >= requiredStaff(shift, role)
-                || !eligible(
-                    candidate,
-                    shift,
-                    role,
-                    work,
-                    surgeryThisWeek,
-                    overnightThisWeek)) {
-            return false;
-            }
-
-            repo.assign(shift.id(), candidate.id());
-            work.computeIfAbsent(
-                candidate.id(),
-                x -> new ArrayList<>()).add(shift);
-            loads.merge(candidate.id(), 1, Integer::sum);
-            assignedCounts.merge(shift.id(), 1, Integer::sum);
-            recordWeeklyShift(
-                candidate,
-                shift,
-                role,
-                surgeryThisWeek,
-                overnightThisWeek);
-        }
-
         for (Shift shift : shifts) {
             int needed = requiredStaff(shift, role)
                 - assignedCounts.getOrDefault(shift.id(), 0);

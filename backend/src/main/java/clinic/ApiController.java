@@ -109,20 +109,6 @@ class ApiController {
         return service.requestLeave(id, x);
     }
 
-    @PostMapping("/users/{id}/work-shift-requests")
-    Decision requestWorkShift(
-            @RequestHeader("X-User-Id") long actor,
-            @PathVariable long id,
-            @RequestBody WorkShiftInput input) {
-        if (actor != id) {
-            throw new ApiException(
-                    403,
-                    "You can only request your own work shifts");
-        }
-
-        return service.requestWorkShift(id, input);
-    }
-
     @PostMapping("/admin/schedule/generate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void generateSchedule(@RequestHeader("X-User-Id") long actor) {

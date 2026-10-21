@@ -8,9 +8,11 @@ the clinic administrator. The initial administrator account is:
 - Username: `admin`
 - Temporary password: `admin`
 
-The administrator must choose a new password before using other parts of the
-system. The backend invalidates all sessions when it restarts, so sign in again
-after a backend restart.
+The administrator and every newly created employee must choose a new password
+before using other parts of the system. This prompt appears only for a
+temporary password created with a new employee account; a password reset by an
+administrator is permanent. The backend invalidates all sessions when it
+restarts, so sign in again after a backend restart.
 
 ## Doctor and Technician Schedule
 
@@ -19,16 +21,16 @@ shifts. Use the previous/next controls to move by two weeks. Select a date or
 shift to review coworkers assigned to the same shift. Surgery shifts are shown
 with their own shift type and color.
 
-Open **Scheduling** to submit time-off or work-shift requests. Vacation
+Open **Scheduling** to submit time-off requests. Vacation
 requests must begin at least three weeks after submission and are limited to
 eight calendar days per calendar year. A sick-day request must be for one day
 after today and is limited to four calendar days per calendar year. The
-remaining balance is shown with the request controls. A work-shift request
-must be for a future date; only doctors may request surgery shifts.
+remaining balance is shown with the request controls. Employees cannot create
+or edit schedules; scheduling and assignments are administrator-only.
 
 The system responds immediately with approval or a reason for denial. An
-approved request causes the affected schedule week or weeks to be regenerated.
-Approved requests are treated as commitments during regeneration.
+approved time-off request causes the affected schedule week or weeks to be
+regenerated.
 
 Use **Log Out** when finished. Sessions are tied to a server-issued token;
 changing the user ID in browser storage does not grant access to another

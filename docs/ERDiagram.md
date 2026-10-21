@@ -5,7 +5,6 @@ erDiagram
     APP_USER ||--o{ SHIFT_ASSIGNMENT : receives
     SCHEDULE_SHIFT ||--o{ SHIFT_ASSIGNMENT : contains
     APP_USER ||--o{ TIME_OFF_REQUEST : submits
-    APP_USER ||--o{ WORK_SHIFT_REQUEST : submits
 
     APP_USER {
         int uid PK
@@ -44,15 +43,6 @@ erDiagram
         timestamptz submitted_at
     }
 
-    WORK_SHIFT_REQUEST {
-        int wrid PK
-        int uid FK
-        date work_date
-        string shift_type
-        string status
-        string reason
-        timestamptz submitted_at
-    }
 ```
 
 The corresponding PostgreSQL table definitions and constraints are maintained in

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SchedulingServiceTest {
     @Test
-    void approvedWorkShiftRequestIsAssignedDuringRegeneration() {
+    void completeScheduleCanBeGeneratedWithoutEmployeeShiftRequests() {
         LocalDate monday = LocalDate.of(2026, 10, 19);
         User requester = new User(
                 1,
@@ -46,15 +46,12 @@ class SchedulingServiceTest {
         InMemoryRepository repo = new InMemoryRepository(
                 doctors,
                 technicians,
-                List.of(new ApprovedWorkShiftRequest(
-                        requester.id(),
-                        monday,
-                ShiftType.SURGERY)),
+                List.of(),
             Map.of());
         SchedulingService scheduler = new SchedulingService(repo);
 
         assertTrue(scheduler.generateWeek(monday));
-        assertTrue(repo.assignments.contains(new Assignment(2, requester.id())));
+        assertTrue(repo.assignments.size() == 120);
     }
 
         @Test

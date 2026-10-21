@@ -18,9 +18,8 @@
 - A vacation request is evaluated using its start date and must start at least
 	21 days after submission. Sick leave is one future calendar day and cannot
 	start today.
-- An approved work-shift request is a commitment. If it cannot be honored
-	alongside staffing, time-off, rest, and doctor weekly shift constraints, the
-	newly submitted request is denied.
+- Doctors and technicians may request only vacation or sick time. The
+	administrator is the only role that creates or edits shift assignments.
 - Technicians are assigned to the same shift as the doctors they support.
 	Required technician counts are set per shift; technician allocation is
 	balanced across the active technician roster.

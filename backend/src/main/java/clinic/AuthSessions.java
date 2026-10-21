@@ -83,9 +83,7 @@ class SessionInterceptor implements HandlerInterceptor {
         boolean changingOwnPassword = request.getMethod().equals("PUT")
                 && path.equals("/api/users/" + actor + "/password");
 
-        if (user.role() == Role.ADMIN
-                && user.mustChangePassword()
-                && !changingOwnPassword) {
+        if (user.mustChangePassword() && !changingOwnPassword) {
             return reject(response, HttpServletResponse.SC_FORBIDDEN,
                     "Change your password before continuing");
         }

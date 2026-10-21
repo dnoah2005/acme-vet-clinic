@@ -149,7 +149,9 @@ class ApiService {
             throw new ApiException(404, "User not found");
         }
 
-        repo.password(target, passwords.encode(password), true);
+        // An administrator-set password is permanent. Only the password
+        // supplied while creating an employee is temporary.
+        repo.password(target, passwords.encode(password), false);
     }
 
     void changeOwnPassword(long user, String password) {
@@ -291,13 +293,6 @@ class ApiService {
                     actor,
                     input,
                     "your request cannot be granted because it conflicts with a previous time-off request that was granted");
-        }
-
-        if (repo.approvedWorkRequestOverlaps(actor, start, end)) {
-            return deny(
-                    actor,
-                    input,
-                    "your request cannot be granted because it conflicts with a previous work-shift request that was granted");
         }
 
         int entitlement = type == LeaveType.VACATION ? 8 : 4;

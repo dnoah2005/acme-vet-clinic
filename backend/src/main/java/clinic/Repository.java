@@ -7,7 +7,7 @@ import java.time.*;
 import java.util.*;
 
 @org.springframework.stereotype.Repository
-class Repository {
+public class Repository {
     private static final ZoneId CLINIC_ZONE =
             ZoneId.of("America/Los_Angeles");
 

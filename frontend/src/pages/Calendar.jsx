@@ -164,12 +164,22 @@ function Calendar({ currentUser }) {
 
           const date = clinicDateString(shift.startAt);
 
-          const coworkers = (row.coworkers || [])
-            .map(
-              (person) =>
-                person.fullName || person.username
-            )
-            .filter(Boolean);
+          const coworkers = (row.coworkers || []).reduce(
+            (groups, person) => {
+              const name = person.fullName || person.username;
+
+              if (!name) return groups;
+
+              if (person.role === "DOCTOR") {
+                groups.doctors.push(name);
+              } else if (person.role === "TECHNICIAN") {
+                groups.technicians.push(name);
+              }
+
+              return groups;
+            },
+            { doctors: [], technicians: [] }
+          );
 
           nextDates[date] = {
             shiftType,
@@ -255,14 +265,28 @@ function Calendar({ currentUser }) {
 
   const renderEventContent = (eventInfo) => {
     const coworkers =
-      eventInfo.event.extendedProps.coworkers || [];
+      eventInfo.event.extendedProps.coworkers || {
+        doctors: [],
+        technicians: [],
+      };
+
+    const coworkerSummary = [
+      coworkers.doctors.length
+        ? `Doctors: ${coworkers.doctors.join(", ")}`
+        : "",
+      coworkers.technicians.length
+        ? `Technicians: ${coworkers.technicians.join(", ")}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" | ");
 
     return (
       <div
         className="doctor-calendar-event"
         title={
-          coworkers.length
-            ? `Coworkers: ${coworkers.join(", ")}`
+          coworkerSummary
+            ? coworkerSummary
             : eventInfo.event.title
         }
       >
@@ -274,9 +298,13 @@ function Calendar({ currentUser }) {
           {eventInfo.event.extendedProps.endLabel}
         </span>
 
-        {coworkers.length > 0 && (
+        {coworkers.doctors.length > 0 && (
+          <small>Doctors: {coworkers.doctors.join(", ")}</small>
+        )}
+
+        {coworkers.technicians.length > 0 && (
           <small>
-            With: {coworkers.join(", ")}
+            Technicians: {coworkers.technicians.join(", ")}
           </small>
         )}
       </div>
@@ -340,6 +368,7 @@ function Calendar({ currentUser }) {
         showNonCurrentDates={false}
         fixedWeekCount={false}
         height="auto"
+        nextDayThreshold="09:00:00"
         datesSet={handleDatesSet}
         events={events}
         eventContent={renderEventContent}

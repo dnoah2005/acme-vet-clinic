@@ -86,9 +86,14 @@ function AdminDashboard({ currentUser, onLogout }) {
   const [assignmentChoices, setAssignmentChoices] = useState({});
 
   useEffect(() => {
-    if (currentUser) {
-      setUser(normalizeUser(currentUser));
-    }
+    if (!currentUser) return undefined;
+
+    const timer = window.setTimeout(
+      () => setUser(normalizeUser(currentUser)),
+      0
+    );
+
+    return () => window.clearTimeout(timer);
   }, [currentUser]);
 
   const headers = useMemo(
@@ -278,13 +283,14 @@ function AdminDashboard({ currentUser, onLogout }) {
 
   useEffect(() => {
     if (!user || user.role !== "ADMIN") {
-      setError(
-        "Administrator login is required. Please log in again."
-      );
       return;
     }
 
-    loadEmployees().catch((e) => setError(e.message));
+    const timer = window.setTimeout(() => {
+      void loadEmployees().catch((e) => setError(e.message));
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [user, loadEmployees]);
 
   const createEmployee = async (event) => {
@@ -982,23 +988,32 @@ function AdminDashboard({ currentUser, onLogout }) {
                                 )
                                 .join(", ")}
 
-                          {row.assignedEmployees.map((person) => (
-                            <button
-                              key={person.id}
-                              type="button"
-                              className="hr-danger-button"
-                              disabled={busy}
-                              onClick={() =>
-                                unassignEmployee(row, person)
-                              }
-                            >
-                              Remove {person.fullName}
-                            </button>
-                          ))}
+                          <div className="hr-assigned-staff-list">
+                            {row.assignedEmployees.map((person) => (
+                              <div
+                                className="hr-assigned-staff"
+                                key={person.id}
+                              >
+                                <span>
+                                  {person.fullName} ({person.role.toLowerCase()})
+                                </span>
+                                <button
+                                  type="button"
+                                  className="hr-remove-assignment"
+                                  disabled={busy}
+                                  onClick={() =>
+                                    unassignEmployee(row, person)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </td>
 
                         <td>
-                          <div className="hr-reset-row">
+                          <div className="hr-assignment-control">
                             <select
                               aria-label={`Employee to assign to ${shiftName(
                                 row.shift.shiftType

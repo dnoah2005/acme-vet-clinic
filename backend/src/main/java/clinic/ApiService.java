@@ -277,7 +277,7 @@ class ApiService {
             return deny(
                     actor,
                     input,
-                    "request is too late: vacation must be requested at least three weeks in advance");
+                    "Request Denied: Vacation time must be requested at least three weeks in advance");
         }
 
         if (type == LeaveType.SICK
@@ -285,14 +285,14 @@ class ApiService {
             return deny(
                     actor,
                     input,
-                    "a sick-day request must be for one day after today");
+                    "Request Denied: a sick-day request must be for one day after today");
         }
 
         if (repo.approvedTimeOffOverlaps(actor, start, end)) {
             return deny(
                     actor,
                     input,
-                    "your request cannot be granted because it conflicts with a previous time-off request that was granted");
+                    "Request Denied: your request cannot be granted because it conflicts with a previous time-off request that was granted");
         }
 
         int entitlement = type == LeaveType.VACATION ? 8 : 4;
@@ -318,8 +318,8 @@ class ApiService {
                         actor,
                         input,
                         type == LeaveType.VACATION
-                                ? "you don't have any more vacation time"
-                                : "you don't have any more sick days");
+                                ? "you don't have vacation time available"
+                                : "you don't have sick days available");
             }
         }
 
@@ -334,7 +334,7 @@ class ApiService {
         }
 
         long requestId =
-                repo.addRequest(actor, input, true, "Request granted");
+                repo.addRequest(actor, input, true, "Request Granted");
 
         try {
             scheduler.generateWeeksAtomically(firstMonday, lastMonday);
@@ -344,12 +344,12 @@ class ApiService {
             return deny(
                     actor,
                     input,
-                    "we will be short on doctors or technicians if we grant your request");
+                    "Request Denied: we will be short on " + (requester.role() == Role.DOCTOR ? "doctors" : "technicians") + " if we grant your request");
         }
 
         return new Decision(
                 true,
-                "request granted; the schedule has been rearranged");
+                "Request Granted: the schedule has been rearranged");
     }
 
     @Transactional
@@ -447,7 +447,7 @@ class ApiService {
         }
 
         long requestId =
-                repo.addWorkRequest(actor, input, true, "Request granted");
+                repo.addWorkRequest(actor, input, true, "Request Granted");
 
         try {
             scheduler.generateWeekAtomically(monday);
@@ -457,12 +457,12 @@ class ApiService {
             return denyWorkShift(
                     actor,
                     input,
-                    "the request cannot be granted because staffing coverage or the required 10-hour rest period would be violated");
+                    "The request cannot be granted because staffing coverage or the required 10-hour rest period would be violated");
         }
 
         return new Decision(
                 true,
-                "request granted; the schedule has been rearranged");
+                "Request Granted: the schedule has been rearranged");
     }
 
     @Transactional

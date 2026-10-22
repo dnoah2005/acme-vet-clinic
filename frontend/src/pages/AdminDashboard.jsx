@@ -86,15 +86,21 @@ function AdminDashboard({ currentUser, onLogout }) {
   const [assignmentChoices, setAssignmentChoices] = useState({});
 
   useEffect(() => {
-    if (currentUser) {
-      setUser(normalizeUser(currentUser));
-    }
+    if (!currentUser) return undefined;
+
+    const timer = window.setTimeout(
+      () => setUser(normalizeUser(currentUser)),
+      0
+    );
+
+    return () => window.clearTimeout(timer);
   }, [currentUser]);
 
   const headers = useMemo(
     () => ({
       "Content-Type": "application/json",
       "X-User-Id": String(user?.id ?? ""),
+      "X-Auth-Token": user?.authToken ?? "",
     }),
     [user]
   );
@@ -254,15 +260,37 @@ function AdminDashboard({ currentUser, onLogout }) {
     }
   }, [api, employees, from, to, selectedEmployee]);
 
+  const generateSchedule = async () => {
+    setBusy(true);
+    setError("");
+    setMessage("");
+
+    try {
+      await api("/admin/schedule/generate", { method: "POST" });
+      setScheduleRows([]);
+      setMessage(
+        "The current week and next week were generated. Load the schedule below to review assignments."
+      );
+    } catch (e) {
+      setError(
+        e.message ||
+          "Could not generate a complete two-week schedule. Verify that enough active staff are available."
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
   useEffect(() => {
     if (!user || user.role !== "ADMIN") {
-      setError(
-        "Administrator login is required. Please log in again."
-      );
       return;
     }
 
-    loadEmployees().catch((e) => setError(e.message));
+    const timer = window.setTimeout(() => {
+      void loadEmployees().catch((e) => setError(e.message));
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [user, loadEmployees]);
 
   const createEmployee = async (event) => {
@@ -780,7 +808,22 @@ function AdminDashboard({ currentUser, onLogout }) {
                 shifts. Surgery shifts are highlighted.
               </p>
             </div>
+
+            <button
+              className="hr-button"
+              onClick={generateSchedule}
+              disabled={busy}
+              type="button"
+            >
+              {busy ? "Generating…" : "Generate current + next week"}
+            </button>
           </div>
+
+          <p className="hr-footnote">
+            Generate the schedule after creating the active roster and
+            whenever you need a fresh two-week schedule. Generation keeps
+            approved work-shift and time-off requests in effect.
+          </p>
 
           <div className="hr-filters">
             <label>
@@ -945,23 +988,32 @@ function AdminDashboard({ currentUser, onLogout }) {
                                 )
                                 .join(", ")}
 
-                          {row.assignedEmployees.map((person) => (
-                            <button
-                              key={person.id}
-                              type="button"
-                              className="hr-danger-button"
-                              disabled={busy}
-                              onClick={() =>
-                                unassignEmployee(row, person)
-                              }
-                            >
-                              Remove {person.fullName}
-                            </button>
-                          ))}
+                          <div className="hr-assigned-staff-list">
+                            {row.assignedEmployees.map((person) => (
+                              <div
+                                className="hr-assigned-staff"
+                                key={person.id}
+                              >
+                                <span>
+                                  {person.fullName} ({person.role.toLowerCase()})
+                                </span>
+                                <button
+                                  type="button"
+                                  className="hr-remove-assignment"
+                                  disabled={busy}
+                                  onClick={() =>
+                                    unassignEmployee(row, person)
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </td>
 
                         <td>
-                          <div className="hr-reset-row">
+                          <div className="hr-assignment-control">
                             <select
                               aria-label={`Employee to assign to ${shiftName(
                                 row.shift.shiftType

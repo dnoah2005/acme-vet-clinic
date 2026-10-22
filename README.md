@@ -1,16 +1,36 @@
-# React + Vite
+# ACME Vet Clinic Scheduler
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React/Vite frontend with a Java Spring Boot and PostgreSQL backend. The
+backend uses JDBC prepared statements directly; it does not use Spring Data
+JPA or `JdbcTemplate`.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Configure PostgreSQL connection values in
+   `backend/src/main/resources/application-local.properties` (or supply the
+   equivalent Spring datasource environment variables).
+2. Start the backend from `backend`:
 
-## React Compiler
+   ```powershell
+   .\mvnw.cmd spring-boot:run
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+3. Start the frontend from `frontend`:
 
-## Expanding the ESLint configuration
+   ```powershell
+   npm install
+   npm run dev
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+4. Open the address shown by Vite (normally `http://localhost:5173`). The
+   initial administrator login is `admin` / `admin`; it must be changed on the
+   first login.
+
+## Initial scheduling setup
+
+Using the administrator dashboard, create the clinic roster (normally 10
+doctors and 20 technicians). In **Schedules**, choose **Generate current +
+next week**. Staff can then sign in and view their assigned two-week schedule.
+
+Project documentation is in `docs/`, including the user manual, assumptions,
+ER diagram, schema, and team log template.

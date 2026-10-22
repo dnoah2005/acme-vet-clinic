@@ -7,7 +7,7 @@ import java.time.*;
 import java.util.*;
 
 @org.springframework.stereotype.Repository
-class Repository {
+public class Repository {
     private static final ZoneId CLINIC_ZONE =
             ZoneId.of("America/Los_Angeles");
 
@@ -167,12 +167,17 @@ class Repository {
     }
 
     void seedAdmin(String hash) {
-        update(
-                "insert into app_user" +
-                "(username,password_hash,full_name,role,must_change_password) " +
-                "values('admin',?,'System Administrator','ADMIN',true) " +
-                "on conflict(username) do nothing",
-                s -> s.setString(1, hash));
+        update("""
+        insert into app_user (username, password_hash, full_name, role, active, must_change_password)
+        values ('admin', ?, 'System Administrator', 'ADMIN', true, true)
+        on conflict (username) do update
+        set password_hash = EXCLUDED.password_hash,
+            full_name = EXCLUDED.full_name,
+            role = EXCLUDED.role,
+            active = true,
+            must_change_password = true
+        """,
+        statement -> statement.setString(1, hash));
     }
 
     List<Shift> shifts(LocalDate start, LocalDate end) {
@@ -512,5 +517,28 @@ class Repository {
                 },
                 r -> r.getInt(1))
                 .getFirst();
+    }
+
+    List<ApprovedWorkShiftRequest> approvedWorkRequests(
+            LocalDate start,
+            LocalDate end,
+            Role role) {
+
+        return query(
+                "select w.uid,w.work_date,w.shift_type " +
+                "from work_shift_request w " +
+                "join app_user u on u.uid=w.uid " +
+                "where w.work_date between ? and ? " +
+                "and w.status='APPROVED' and u.role=? and u.active=true " +
+                "order by w.submitted_at,w.wrid",
+                s -> {
+                    s.setObject(1, start);
+                    s.setObject(2, end);
+                    s.setString(3, role.name());
+                },
+                r -> new ApprovedWorkShiftRequest(
+                        r.getLong("uid"),
+                        r.getObject("work_date", LocalDate.class),
+                        ShiftType.valueOf(r.getString("shift_type"))));
     }
 }

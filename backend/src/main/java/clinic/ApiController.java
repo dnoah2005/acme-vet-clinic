@@ -24,7 +24,13 @@ class ApiController {
 
     @PostMapping("/auth/login")
     LoginResponse login(@RequestBody LoginRequest x) {
-        return new LoginResponse(service.login(x));
+        return service.login(x);
+    }
+
+    @PostMapping("/auth/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void logout(@RequestHeader("X-Auth-Token") String token) {
+        service.logout(token);
     }
 
     @PutMapping("/users/{id}/password")
@@ -103,18 +109,10 @@ class ApiController {
         return service.requestLeave(id, x);
     }
 
-    @PostMapping("/users/{id}/work-shift-requests")
-    Decision requestWorkShift(
-            @RequestHeader("X-User-Id") long actor,
-            @PathVariable long id,
-            @RequestBody WorkShiftInput input) {
-        if (actor != id) {
-            throw new ApiException(
-                    403,
-                    "You can only request your own work shifts");
-        }
-
-        return service.requestWorkShift(id, input);
+    @PostMapping("/admin/schedule/generate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void generateSchedule(@RequestHeader("X-User-Id") long actor) {
+        service.regenerate(actor);
     }
 
     @PutMapping("/admin/shifts/{shiftId}/assignments/{userId}")

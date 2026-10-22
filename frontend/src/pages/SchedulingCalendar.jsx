@@ -10,18 +10,9 @@ const VACATION_ALLOWANCE = 8;
 const SICK_ALLOWANCE = 4;
 const CLINIC_TIME_ZONE = "America/Los_Angeles";
 
-const SHIFT_INFO = {
-  EARLY: { label: "Early Morning", color: "#16a34a" },
-  EIGHT_THIRTY: { label: "8:30 Shift", color: "#2563eb" },
-  LATE: { label: "Late Doctor", color: "#ea580c" },
-  SURGERY: { label: "Surgery", color: "#dc2626" },
-  OVERNIGHT: { label: "Overnight", color: "#7c3aed" },
-  SUNDAY: { label: "Sunday Shift", color: "#0891b2" },
-};
-
 async function readResponse(response) {
   const text = await response.text();
-  let data = {};
+  let data;
 
   try {
     data = text ? JSON.parse(text) : {};
@@ -86,17 +77,16 @@ function SchedulingCalendar({ currentUser }) {
   const calendarRef = useRef(null);
 
   const [calendarTitle, setCalendarTitle] = useState("");
-  const [mySchedules, setMySchedules] = useState({});
   const [selectedDate, setSelectedDate] = useState("");
   const [rangeStart, setRangeStart] = useState("");
   const [rangeEnd, setRangeEnd] = useState("");
+  // Retained as inactive placeholders while old schedule-panel markup is
+  // removed in a future visual cleanup.
   const [selectedShiftInfo, setSelectedShiftInfo] = useState(null);
-
-  const [loadingSchedules, setLoadingSchedules] = useState(false);
-  const [scheduleError, setScheduleError] = useState("");
+  const [loadingSchedules] = useState(false);
+  const [scheduleError] = useState("");
 
   const [timeOffMode, setTimeOffMode] = useState("");
-  const [selectedShiftType, setSelectedShiftType] = useState("EARLY");
   const [timeOffMessage, setTimeOffMessage] = useState("");
   const [timeOffDateValid, setTimeOffDateValid] = useState(false);
   const [submittingTimeOff, setSubmittingTimeOff] = useState(false);
@@ -117,99 +107,9 @@ function SchedulingCalendar({ currentUser }) {
   const requestHeaders = useCallback(
     () => ({
       "X-User-Id": String(userId),
+      "X-Auth-Token": currentUser?.authToken ?? "",
     }),
-    [userId]
-  );
-
-  const loadSchedules = useCallback(
-    async (from, to) => {
-      if (!userId) {
-        setMySchedules({});
-        setScheduleError(
-          "Your login session does not include a user ID. Please log in again."
-        );
-        return;
-      }
-
-      setLoadingSchedules(true);
-      setScheduleError("");
-
-      try {
-        const params = new URLSearchParams({ from, to });
-
-        const response = await fetch(
-          `${API_URL}/users/${encodeURIComponent(
-            userId
-          )}/schedule?${params}`,
-          {
-            headers: requestHeaders(),
-          }
-        );
-
-        const data = await readResponse(response);
-
-        if (!Array.isArray(data)) {
-          throw new Error(
-            "The schedule endpoint returned an unexpected response."
-          );
-        }
-
-        const nextSchedules = {};
-
-        data.forEach((row) => {
-          const shift = row.shift;
-
-          if (!shift?.startAt || !shift?.endAt) return;
-
-          const shiftType = String(
-            shift.shiftType || ""
-          ).toUpperCase();
-
-          const info = SHIFT_INFO[shiftType] || {
-            label: shiftType.replaceAll("_", " ") || "Shift",
-            color: "#555555",
-          };
-
-          const shiftDate = clinicDateString(shift.startAt);
-
-          const coworkers = (row.coworkers || [])
-            .map((person) => person.fullName || person.username)
-            .filter(Boolean);
-
-          const schedule = {
-            id: shift.id,
-            date: shiftDate,
-            shiftType,
-            label: info.label,
-            color: info.color,
-            startAt: shift.startAt,
-            endAt: shift.endAt,
-            coworkers,
-          };
-
-          if (!nextSchedules[shiftDate]) {
-            nextSchedules[shiftDate] = [];
-          }
-
-          // Keep assignments for conflict checking, but do not
-          // add them as events to the Scheduling calendar.
-          nextSchedules[shiftDate].push(schedule);
-        });
-
-        setMySchedules(nextSchedules);
-      } catch (error) {
-        console.error("Could not load schedules:", error);
-
-        setScheduleError(
-          error.message || "Could not load your schedule."
-        );
-
-        setMySchedules({});
-      } finally {
-        setLoadingSchedules(false);
-      }
-    },
-    [requestHeaders, userId]
+    [currentUser?.authToken, userId]
   );
 
   const loadTimeOffBalance = useCallback(async () => {
@@ -266,31 +166,19 @@ function SchedulingCalendar({ currentUser }) {
     }
   }, [requestHeaders, userId]);
 
-  const refreshVisibleSchedules = useCallback(async () => {
-    const api = calendarRef.current?.getApi();
-
-    if (!api) return;
-
-    const from = clinicDateString(api.view.activeStart);
-    const to = addDays(clinicDateString(api.view.activeEnd), -1);
-
-    await loadSchedules(from, to);
-  }, [loadSchedules]);
-
   useEffect(() => {
-    loadTimeOffBalance();
+    const timer = window.setTimeout(() => {
+      void loadTimeOffBalance();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [loadTimeOffBalance]);
 
   const handleDatesSet = useCallback(
     (dateInfo) => {
       setCalendarTitle(dateInfo.view.title);
-
-      const from = dateInfo.startStr.slice(0, 10);
-      const to = addDays(dateInfo.endStr.slice(0, 10), -1);
-
-      loadSchedules(from, to);
     },
-    [loadSchedules]
+    []
   );
 
   const getVacationMinDate = () => addDays(today, 21);
@@ -328,16 +216,14 @@ function SchedulingCalendar({ currentUser }) {
     setSelectedDate("");
     setRangeStart("");
     setRangeEnd("");
-    setSelectedShiftType("EARLY");
     setTimeOffDateValid(false);
-    setSelectedShiftInfo(null);
 
     setTimeOffMessage(
       type === "VACATION"
         ? "Select the first and last vacation dates on the calendar. Requests must be submitted at least 3 weeks ahead."
         : type === "SICK"
           ? "Select any future date for a one-day sick-time request. Same-day requests are not allowed."
-          : "Select a future work date, choose the shift type, and submit your request. The scheduler will grant or deny it immediately."
+          : ""
     );
   };
 
@@ -374,103 +260,17 @@ function SchedulingCalendar({ currentUser }) {
       return "";
     }
 
-    if (type === "WORK") {
-      if (start !== end) {
-        return "Work-shift requests must be for one date at a time.";
-      }
-
-      if (start <= today) {
-        return "Work-shift requests must be for a future date.";
-      }
-
-      if ((mySchedules[start] || []).length > 0) {
-        return "You already have a shift assigned on this date. Choose another date.";
-      }
-
-      if (!selectedShiftType) {
-        return "Choose the shift type you want to work.";
-      }
-
-      return "";
-    }
-
     return "Select a request type first.";
   };
 
   const handleDateClick = (info) => {
     const clickedDate = info.dateStr;
 
-    setSelectedShiftInfo(null);
-
     if (!timeOffMode) {
       setSelectedDate(clickedDate);
-
-      setSelectedShiftInfo({
-        date: clickedDate,
-        shifts: mySchedules[clickedDate] || [],
-      });
-
-      return;
-    }
-
-    if (timeOffMode === "WORK") {
-      setRangeStart(clickedDate);
-      setRangeEnd(clickedDate);
-      setSelectedDate(clickedDate);
-
-      const existingShifts = mySchedules[clickedDate] || [];
-
-      if (existingShifts.length > 0) {
-        setTimeOffDateValid(false);
-        setTimeOffMessage(
-          `You already have ${existingShifts
-            .map((shift) => shift.label)
-            .join(", ")} assigned on ${clickedDate}. Choose a different date.`
-        );
-        return;
-      }
-
-      if (clickedDate <= today) {
-        setTimeOffDateValid(false);
-        setTimeOffMessage(
-          "Work-shift requests must be for a future date."
-        );
-        return;
-      }
-
-      const isSunday =
-        new Date(`${clickedDate}T12:00:00`).getDay() === 0;
-
-      const availableTypes = isSunday
-        ? ["SUNDAY", "OVERNIGHT"]
-        : [
-            "EARLY",
-            "SURGERY",
-            "EIGHT_THIRTY",
-            "LATE",
-            "OVERNIGHT",
-          ];
-
-      const preferredType =
-        availableTypes.includes(selectedShiftType) &&
-        (
-          selectedShiftType !== "SURGERY" ||
-          currentUser?.role === "DOCTOR"
-        )
-          ? selectedShiftType
-          : isSunday
-            ? "SUNDAY"
-            : "EARLY";
-
-      setSelectedShiftType(preferredType);
-      setTimeOffDateValid(true);
-
       setTimeOffMessage(
-        `Request ${
-          SHIFT_INFO[preferredType]?.label || preferredType
-        } on ${clickedDate}? Confirm to submit.`
+        "Choose Vacation or Sick Time to make a time-off request."
       );
-
       return;
     }
 
@@ -575,34 +375,19 @@ function SchedulingCalendar({ currentUser }) {
     setTimeOffMessage("");
 
     try {
-      const isWorkRequest = timeOffMode === "WORK";
-
-      const url = isWorkRequest
-        ? `${API_URL}/users/${encodeURIComponent(
-            userId
-          )}/work-shift-requests`
-        : `${API_URL}/users/${encodeURIComponent(
-            userId
-          )}/time-off`;
-
-      const body = isWorkRequest
-        ? {
-            workDate: rangeStart,
-            shiftType: selectedShiftType,
-          }
-        : {
-            leaveType: timeOffMode,
-            startDate: rangeStart,
-            endDate: rangeEnd,
-          };
-
-      const response = await fetch(url, {
+      const response = await fetch(`${API_URL}/users/${encodeURIComponent(
+        userId
+      )}/time-off`, {
         method: "POST",
         headers: {
           ...requestHeaders(),
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          leaveType: timeOffMode,
+          startDate: rangeStart,
+          endDate: rangeEnd,
+        }),
       });
 
       const data = await readResponse(response);
@@ -614,23 +399,13 @@ function SchedulingCalendar({ currentUser }) {
       }
 
       setTimeOffMessage(
-        data.reason ||
-          (isWorkRequest
-            ? "Your work-shift request was approved."
-            : "Your time-off request was approved.")
+        data.reason || "Your time-off request was approved."
       );
 
       setTimeOffMode("");
       clearTimeOffSelection();
 
-      if (isWorkRequest) {
-        await refreshVisibleSchedules();
-      } else {
-        await Promise.all([
-          loadTimeOffBalance(),
-          refreshVisibleSchedules(),
-        ]);
-      }
+      await loadTimeOffBalance();
     } catch (error) {
       console.error("Could not submit request:", error);
 
@@ -647,7 +422,6 @@ function SchedulingCalendar({ currentUser }) {
   const cancelTimeOff = () => {
     setTimeOffMode("");
     setTimeOffMessage("");
-    setSelectedShiftType("EARLY");
     clearTimeOffSelection();
   };
 
@@ -671,8 +445,8 @@ function SchedulingCalendar({ currentUser }) {
         <h1>Scheduling</h1>
 
         <p>
-          View available dates, request work shifts, and manage
-          vacation or sick time.
+          Request vacation or sick time. Schedule assignments are
+          managed by the clinic administrator.
         </p>
       </header>
 
@@ -777,78 +551,15 @@ function SchedulingCalendar({ currentUser }) {
             <strong>
               {timeOffMode === "VACATION"
                 ? "Vacation selection"
-                : timeOffMode === "SICK"
-                  ? "Sick-time selection"
-                  : "Work-shift selection"}
+                : "Sick-time selection"}
             </strong>
 
             <p>
               {timeOffMode === "VACATION"
                 ? "Click a start date, then click an end date. The first day must be at least 21 days away."
-                : timeOffMode === "SICK"
-                  ? "Click any future date. Sick-time requests cover one day and cannot be for today."
-                  : "Click a future date. Dates with an assigned shift cannot be requested again."}
+                : "Click any future date. Sick-time requests cover one day and cannot be for today."}
             </p>
 
-            {timeOffMode === "WORK" && (
-              <label className="work-shift-type-label">
-                Preferred shift
-
-                <select
-                  className="work-shift-type-select"
-                  value={selectedShiftType}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setSelectedShiftType(value);
-
-                    if (!rangeStart || !rangeEnd) {
-                      setTimeOffDateValid(false);
-                      setTimeOffMessage(
-                        "Select a future date on the calendar, then confirm your request."
-                      );
-                      return;
-                    }
-
-                    const validationError = validateTimeOffRange(
-                      rangeStart,
-                      rangeEnd,
-                      "WORK"
-                    );
-
-                    setTimeOffDateValid(!validationError);
-                    setTimeOffMessage(
-                      validationError ||
-                        `Request ${
-                          SHIFT_INFO[value]?.label || value
-                        } on ${rangeStart}? Confirm to submit. The scheduler checks staffing and rest requirements.`
-                    );
-                  }}
-                >
-                  {(
-                    rangeStart &&
-                    new Date(`${rangeStart}T12:00:00`).getDay() === 0
-                      ? ["SUNDAY", "OVERNIGHT"]
-                      : [
-                          "EARLY",
-                          "SURGERY",
-                          "EIGHT_THIRTY",
-                          "LATE",
-                          "OVERNIGHT",
-                        ]
-                  )
-                    .filter(
-                      (type) =>
-                        type !== "SURGERY" ||
-                        currentUser?.role === "DOCTOR"
-                    )
-                    .map((type) => (
-                      <option key={type} value={type}>
-                        {SHIFT_INFO[type].label}
-                      </option>
-                    ))}
-                </select>
-              </label>
-            )}
           </div>
 
           <button
@@ -872,9 +583,7 @@ function SchedulingCalendar({ currentUser }) {
             <strong>
               {timeOffDateValid
                 ? "Confirm your request"
-                : timeOffMode === "WORK"
-                  ? "Work-shift request"
-                  : "Time-off request"}
+                : "Time-off request"}
             </strong>
 
             <p>{timeOffMessage}</p>
@@ -907,22 +616,13 @@ function SchedulingCalendar({ currentUser }) {
 
       {!timeOffMode && (
         <div className="scheduling-instructions">
-          <strong>Request shifts and time off</strong>
+          <strong>Request time off</strong>
 
           <p>
-            This calendar is for selecting request dates. Your
-            assigned shifts are shown in the Schedule View tab.
-            Dates where you already have a shift cannot be used
-            for another work-shift request.
+            Select Vacation or Sick Time, then click dates in the calendar.
+            Your assigned shifts are shown in the Schedule View tab; only an
+            administrator can create or edit the schedule.
           </p>
-
-          <button
-            type="button"
-            className="time-off-button work-request-button"
-            onClick={() => startTimeOffMode("WORK")}
-          >
-            Request Work Shift
-          </button>
         </div>
       )}
 
@@ -932,7 +632,7 @@ function SchedulingCalendar({ currentUser }) {
             onClick={handlePrevious}
             className="scheduling-calendar-arrow"
             type="button"
-            aria-label="Previous month"
+            aria-label="Previous two weeks"
           >
             ←
           </button>
@@ -943,7 +643,7 @@ function SchedulingCalendar({ currentUser }) {
             onClick={handleNext}
             className="scheduling-calendar-arrow"
             type="button"
-            aria-label="Next month"
+            aria-label="Next two weeks"
           >
             →
           </button>
@@ -966,9 +666,7 @@ function SchedulingCalendar({ currentUser }) {
             Select a date on the calendar to continue your{" "}
             {timeOffMode === "VACATION"
               ? "vacation request"
-              : timeOffMode === "SICK"
-                ? "sick-time request"
-                : "work-shift request"}
+              : "sick-time request"}
             .
           </p>
         )}
@@ -976,13 +674,24 @@ function SchedulingCalendar({ currentUser }) {
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          initialView="twoWeek"
+          views={{
+            twoWeek: {
+              type: "dayGrid",
+              duration: { weeks: 2 },
+            },
+          }}
           headerToolbar={false}
           showNonCurrentDates={true}
           fixedWeekCount={false}
           height="auto"
           datesSet={handleDatesSet}
           dateClick={handleDateClick}
+          dayCellClassNames={(cell) =>
+            clinicDateString(cell.date) === selectedDate
+              ? ["time-off-date-selected"]
+              : []
+          }
           events={[]}
         />
       </section>

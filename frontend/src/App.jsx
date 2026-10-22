@@ -31,7 +31,14 @@ function readSavedUser() {
       return null;
     }
 
-    return normalizeUser(JSON.parse(savedUser));
+    const user = normalizeUser(JSON.parse(savedUser));
+
+    if (!user?.authToken) {
+      localStorage.removeItem("acmeUser");
+      return null;
+    }
+
+    return user;
   } catch {
     localStorage.removeItem("acmeUser");
     return null;
@@ -49,8 +56,7 @@ function App() {
   const [passwordMessage, setPasswordMessage] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
 
-  const mustChangeAdminPassword =
-    currentUser?.role === "ADMIN" &&
+  const mustChangePassword =
     currentUser?.mustChangePassword === true;
 
   useEffect(() => {
@@ -72,20 +78,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!currentUser) {
-      setPage("welcome");
-      return;
-    }
+    const targetPage = !currentUser
+      ? "welcome"
+      : currentUser.role === "DOCTOR"
+        ? "doctor"
+        : currentUser.role === "TECHNICIAN"
+          ? "technician"
+          : currentUser.role === "ADMIN"
+            ? "admin"
+            : "welcome";
 
-    if (currentUser.role === "DOCTOR") {
-      setPage("doctor");
-    } else if (currentUser.role === "TECHNICIAN") {
-      setPage("technician");
-    } else if (currentUser.role === "ADMIN") {
-      setPage("admin");
-    } else {
-      setPage("welcome");
-    }
+    const timer = window.setTimeout(() => setPage(targetPage), 0);
+
+    return () => window.clearTimeout(timer);
   }, [currentUser]);
 
   const handleLoginSubmit = async (event) => {
@@ -116,8 +121,8 @@ function App() {
         return;
       }
 
-      if (!data.user) {
-        setLoginMessage("The server did not return a user account.");
+      if (!data.user || !data.token) {
+        setLoginMessage("The server did not return a valid login session.");
         return;
       }
 
@@ -134,18 +139,13 @@ function App() {
         return;
       }
 
-      const needsPasswordChange =
-        returnedUser.role === "ADMIN" &&
-        (
-          returnedUser.mustChangePassword ||
-          (
-            username.toLowerCase() === "admin" &&
-            password === "admin"
-          )
-        );
+      const needsPasswordChange = Boolean(
+        returnedUser.mustChangePassword
+      );
 
       const user = {
         ...returnedUser,
+        authToken: data.token,
         mustChangePassword: needsPasswordChange,
       };
 
@@ -160,7 +160,7 @@ function App() {
     }
   };
 
-  const handleAdminPasswordChange = async (event) => {
+  const handleTemporaryPasswordChange = async (event) => {
     event.preventDefault();
     setPasswordMessage("");
 
@@ -174,13 +174,6 @@ function App() {
     if (newPassword.length < 8) {
       setPasswordMessage(
         "Your new password must be at least 8 characters long."
-      );
-      return;
-    }
-
-    if (newPassword === "admin") {
-      setPasswordMessage(
-        "Choose a new password instead of keeping the temporary password."
       );
       return;
     }
@@ -200,6 +193,7 @@ function App() {
           headers: {
             "Content-Type": "application/json",
             "X-User-Id": String(currentUser.id),
+            "X-Auth-Token": currentUser.authToken,
           },
           body: JSON.stringify({
             password: newPassword,
@@ -246,6 +240,18 @@ function App() {
   };
 
   const handleLogout = () => {
+    if (currentUser?.id && currentUser?.authToken) {
+      fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "X-User-Id": String(currentUser.id),
+          "X-Auth-Token": currentUser.authToken,
+        },
+      }).catch((error) => {
+        console.error("Could not revoke login session:", error);
+      });
+    }
+
     localStorage.removeItem("acmeUser");
     setCurrentUser(null);
     setLoginMessage("");
@@ -270,10 +276,9 @@ function App() {
 
             {backendMessage && (
               <p className="backend-status" role="status">
-                Backend: {backendMessage}
+                We treat your pets as our own.
               </p>
             )}
-
             <div className="button-container">
               <button
                 className="primary-button"
@@ -359,11 +364,11 @@ function App() {
         />
       )}
 
-      {mustChangeAdminPassword && (
+      {mustChangePassword && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="admin-password-title"
+          aria-labelledby="temporary-password-title"
           style={{
             position: "fixed",
             inset: 0,
@@ -386,22 +391,21 @@ function App() {
               boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
             }}
           >
-            <h2 id="admin-password-title">
-              Change the temporary admin password
+            <h2 id="temporary-password-title">
+              Change your temporary password
             </h2>
 
             <p>
-              Before you can use the admin dashboard, replace the
-              temporary password with a new password of at least
-              8 characters.
+              Before you can use the system, replace the temporary
+              password with a new password of at least 8 characters.
             </p>
 
-            <form onSubmit={handleAdminPasswordChange}>
-              <label htmlFor="new-admin-password">
+            <form onSubmit={handleTemporaryPasswordChange}>
+              <label htmlFor="new-temporary-password">
                 New password
               </label>
               <input
-                id="new-admin-password"
+                id="new-temporary-password"
                 type="password"
                 value={newPassword}
                 onChange={(event) =>
@@ -420,11 +424,11 @@ function App() {
                 }}
               />
 
-              <label htmlFor="confirm-admin-password">
+              <label htmlFor="confirm-temporary-password">
                 Confirm new password
               </label>
               <input
-                id="confirm-admin-password"
+                id="confirm-temporary-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(event) =>

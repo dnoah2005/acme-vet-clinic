@@ -34,28 +34,6 @@
     reason TEXT, submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(), CHECK(end_date >= start_date)
     );
 
-    CREATE TABLE IF NOT EXISTS work_shift_request (
-    wrid INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    uid INTEGER NOT NULL REFERENCES app_user(uid),
-    work_date DATE NOT NULL,
-    shift_type VARCHAR(20) NOT NULL CHECK (
-        shift_type IN (
-            'EARLY',
-            'EIGHT_THIRTY',
-            'LATE',
-            'SUNDAY',
-            'OVERNIGHT',
-            'SURGERY'
-        )
-    ),
-    status VARCHAR(10) NOT NULL CHECK (
-        status IN ('APPROVED', 'DENIED')
-    ),
-    reason TEXT,
-    submitted_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-    CREATE INDEX IF NOT EXISTS work_request_user_date_idx ON work_shift_request(uid, work_date);
     CREATE INDEX IF NOT EXISTS assignment_user_idx ON shift_assignment(uid);
     CREATE INDEX IF NOT EXISTS shift_start_idx ON schedule_shift(start_at);
     CREATE INDEX IF NOT EXISTS request_user_date_idx ON time_off_request(uid,start_date,end_date);

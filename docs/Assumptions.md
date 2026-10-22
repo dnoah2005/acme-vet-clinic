@@ -27,7 +27,4 @@
 	their historical account and related database records.
 - Login sessions are held in backend memory and are cleared when the backend
 	process restarts.
-
-These assumptions should be confirmed with the project client during lab
-discussion, especially how annual leave days are counted and whether four
-shifts is a target or a strict limit.
+- The Admin should be the one rescheduling emplyees instead of the employees rescheaduling themselves.

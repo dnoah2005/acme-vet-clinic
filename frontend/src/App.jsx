@@ -274,6 +274,15 @@ function App() {
 
             <p>Your pets are our number 1 priority.</p>
 
+<<<<<<< HEAD
+=======
+            {backendMessage && (
+              <p className="backend-status" role="status">
+                We treat your pets as our own.
+              </p>
+            )}
+
+>>>>>>> 569767e (final)
             <div className="button-container">
               <button
                 className="primary-button"

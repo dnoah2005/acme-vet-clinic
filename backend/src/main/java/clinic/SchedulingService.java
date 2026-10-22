@@ -33,11 +33,7 @@ class SchedulingService {
         }
     }
 
-    /**
-     * Generates all requested weeks as one nested transaction.
-     * If any week cannot be generated, throwing an exception rolls back
-     * every schedule change made during this operation.
-     */
+
     @Transactional(propagation = Propagation.NESTED)
     public void generateWeeksAtomically(
             LocalDate firstMonday,
@@ -56,10 +52,7 @@ class SchedulingService {
         }
     }
 
-    /**
-     * Generates one week in a nested transaction.
-     * A failed generation rolls back instead of leaving partial shifts.
-     */
+
     @Transactional(propagation = Propagation.NESTED)
     public void generateWeekAtomically(LocalDate monday) {
         if (!generateWeekInternal(monday)) {
@@ -70,10 +63,7 @@ class SchedulingService {
         }
     }
 
-    /**
-     * Retained for compatibility with existing code.
-     * New request-handling code should use generateWeekAtomically().
-     */
+
     boolean generateWeek(LocalDate monday) {
         return generateWeekInternal(monday);
     }

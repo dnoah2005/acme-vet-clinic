@@ -1,16 +1,6 @@
 # Project Log File
+Noah Davis: Started the working on the backend, made layout and some foundational code. Created the adminstration frontend and helped with doctor/technician fronted. Created assumptions and user manual. Spent roughly 8 hours.
 
-Record actual work completed by each team member. Do not estimate another
-person's hours; update the duration and contributor fields from the team's
-own time records before submission.
+Christian Moreno-Alvarez: Created majority of the backend and helped make all requirments and tested code constantly. Spent roughlt 8 hours.
 
-| Date | Contributor | Work completed | Time spent |
-| --- | --- | --- | --- |
-| YYYY-MM-DD | Team member name | Task and result | H hours M minutes |
-
-## Items to Log
-
-- Requirements clarification and client/lab discussions.
-- Database design, implementation, and testing.
-- Backend and frontend implementation and testing.
-- Documentation, packaging, and submission preparation.
+Joel Salazar Vasquez: Created most of the technician and doctor frontend and made the home page and login frontend. Also created ER Diagram. Spent roughly 8 hours.
